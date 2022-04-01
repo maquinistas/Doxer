@@ -1,0 +1,109 @@
+path('drivers/',views.getdrivers),
+path('driver/<str:pk>/update',views.updateDriver),
+path('driver/<str:pk>/delete',views.driverdelete),
+path('driver/<str:pk>/',views.getdriver)
+
+
+@api_view(['PUT'])
+def updateDriver(request,pk):
+    data = request.data
+    
+    driver = Driver.objects.get(id=pk)
+    serializer = getDriverSerializer(driver,data=data)
+    if serializer.is_valid():
+        serializer.save()
+    
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+def driverdelete(request,pk):
+    serial = Driver.objects.get(id=pk)
+    serial.delete()
+    return Response('Driver Was Deleted!')
+
+
+@api_view(['GET'])
+def getdrivers(request):
+    driver = Driver.objects.all()
+    serializer = getDriverSerializer(driver,many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def getdriver(request,pk):
+    driver = Driver.objects.get(id=pk)
+    serializer = getDriverSerializer(driver)
+    return Response(serializer.data)
+
+
+Json Data = [
+            {
+                "email_or_num" : "9874569874",
+                "otp" : "1234"
+            }
+
+            {
+                "email_or_num" : "nik2@gmail.com",
+                "password" : "123456",
+                "cpassword" : "123456"
+            }
+
+            {
+                "email_or_num" : "nik2@gmail.com",
+                "password" : "123456"
+            }
+        ]
+
+
+# @api_view(['GET'])
+# def RidesFilterByCarsRequests(request,pk,dd):
+#     try:
+#         getrs = Driver.objects.get(id=pk)
+#         getreq = Ride_pin.objects.filter(mine_ride=getrs.id,status="0",ride_type=dd)
+#         print(getreq)
+#         if getreq:
+#             sr = RidepinSerializer(getreq,many=True)
+#             return Response({'status':1, 'msg':"Success","data":sr.data}) 
+#         else:
+#             print("nikhil")
+#             return Response({'status':0,'msg':'No Requestes'})      
+#     except ObjectDoesNotExist:
+#         return Response({"status": 0, "msg" : "Id IS wrong"})
+
+# @api_view(['POST'])
+# def SearchForRideRequest(request,pk,dd):
+#     try:
+#         data = request.data
+#         pick = data["pickUp"]
+#         drop = data["dropout"]
+#         date = data["date"]
+#         pcity = Cities.objects.filter(name=pick)
+#         dcity = Cities.objects.filter(name=drop)
+#         print(pcity)
+#         print(dcity)
+#         getpas = Driver.objects.get(id=pk)
+#         getreq = Ride_pin.objects.filter(mine_ride=getpas.id,ride_type=dd,ride_date=date,pickUp=pcity[0].id,dropout=dcity[0].id,status='0')
+#         if getreq:
+#             sr = RidepinSerializer(getreq,many=True)
+#             return Response({'status':1, 'msg':"Success","data":sr.data}) 
+#         else:
+#             print("nikhil")
+#             return Response({'status':0,'msg':'No Requestes'})      
+#     except ObjectDoesNotExist:
+#         return Response({"status": 0, "msg" : "Id IS wrong"})
+
+
+Passanger page
+# @api_view(['GET'])
+# def PassengerAddBookingList(request,pk):
+#     try:
+#         getpas = Passanger.objects.get(id=pk)
+#         bb = Booking_pin.objects.filter(mine_booking=pk,status='0')
+#         if bb:
+#             serial = BookingpinSerializer(bb,many=True)
+#             return Response({"status": 1,"msg": "success","data": serial.data})
+#         else:
+#             return Response({'status':0 ,"msg":"Record Not Founded"})
+#     except ObjectDoesNotExist:
+#         return Response({'status':0 ,"msg":"Wrong Id"})
+
+
