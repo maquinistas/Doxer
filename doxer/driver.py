@@ -468,7 +468,7 @@ def AddRideForCar(request,pk):
         if(not fees):
             return Response({'status':0,'msg':'Fees is Not Add'})
 
-        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,time = time)
+        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,time = time,publish='1')
         if len(rideserach) > 0:
             return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
         else:
@@ -598,7 +598,7 @@ def RidePublishedStop(request,pk):
             rde.save()
             return Response({"status" : 1,'msg': "Ride stop"})
         else:
-            rde = Ride.objects.get(id=pk)
+            rde = Ride.objects.get(id=pk,publish='1')
             if rde.trip_status == "O":
                 Trip = "On The Way"
             if rde.trip_status == "E":
@@ -612,7 +612,7 @@ def AddInformationRide(request,pk):
     showtime = strftime("%Y-%m-%d %H:%M:%S", )
     try:
         data = request.data
-        updateride = Ride.objects.get(id=pk)
+        updateride = Ride.objects.get(id=pk,publish='1')
         updateride.driver = updateride.getdriver.name if updateride.getdriver.name else updateride.getdriver.email_or_num
         updateride.update = showtime
         getdrop = RideSerializer(updateride,data=data)
@@ -697,10 +697,10 @@ def RequestForBooking(request,bid,did):
     # try:
     data = request.data
     ofprice = data['bid_price']
-    bookingid = Ride.objects.get(id=bid)
+    bookingid = Ride.objects.get(id=bid,publish='1')
     if bookingid.status == '0':    
         driverid = Driver.objects.get(id=did)
-        passid = Passanger.objects.get(id=bookingid.getpassenger.id)
+        passid = Passanger.objects.get(id=bookingid.getpassenger.id,publish='1')
         booking = Ride.objects.filter(getdriver=did,pickUp=bookingid.pickUp,dropout=bookingid.dropout,date=bookingid.date,as_user='Driver')
         if len(booking) > 0:
             booking = booking[0].id
@@ -764,7 +764,7 @@ def PassengerProfileViewByPassenger(request,pk):
 @api_view(['GET'])
 def RidesBookingFilter(request,pk):
     try:
-        getr = Ride.objects.get(id=pk)
+        getr = Ride.objects.get(id=pk,publish='1')
         getreq = Ride_pin.objects.filter(getride=getr.id,status="1",)
         sr = MineRidepinSerializer(getreq,many=True)
         return Response({'status':1, 'msg':"Success",
@@ -800,7 +800,7 @@ def RideListingOfFilter(request,pk):
     try:
         getreq = Ride_pin.objects.filter(getride=pk,status="0").exclude(as_user='Driver_bid')
         sr = MineRidepinSerializer(getreq,many=True)
-        ride_st = Ride.objects.get(id=pk)
+        ride_st = Ride.objects.get(id=pk,publish='1')
         return Response({'status':1, 'msg':"Success",
                             "data":sr.data})      
     except ObjectDoesNotExist:
@@ -848,7 +848,7 @@ def RejectRequestForTripByDriver(request,pk):
 def GetMyCarRide(request,pk):
     try:
         getdri = Driver.objects.get(id=pk)
-        getride = Ride.objects.filter(getdriver=getdri,ride_type='C').exclude(status='3')
+        getride = Ride.objects.filter(getdriver=getdri,ride_type='C',publish='1').exclude(status='3')
         if getride:
             serial = CarRideFilterserializer(getride,many=True)
             return Response({'status':1, 'msg':"Success","data":serial.data}) 
@@ -861,7 +861,7 @@ def GetMyCarRide(request,pk):
 def GetMyTruckRide(request,pk):
     try:
         getdri = Driver.objects.get(id=pk)
-        getride = Ride.objects.filter(getdriver=getdri,ride_type='T').exclude(status='3')
+        getride = Ride.objects.filter(getdriver=getdri,ride_type='T',publish='1').exclude(status='3')
         if getride:
             serial = TruckRideFilterserializer(getride,many=True)
             return Response({'status':1, 'msg':"Success","data":serial.data}) 
@@ -931,7 +931,7 @@ def SerchBookingFilter(request,dd,pk):
     pick = data['pickUp']
     drop = data['dropout']
     date = data['date']
-    book = Ride.objects.filter(status=0,ride_type=dd,pickUp=pick,dropout=drop,date=date,as_user="Passenger")
+    book = Ride.objects.filter(status=0,ride_type=dd,pickUp=pick,dropout=drop,date=date,as_user="Passenger",publish='1')
     if len(book) > 0:
         lis = []
         for i in book:
@@ -1038,7 +1038,7 @@ def AcceptRequestForTripByDriver(request,pk):
     try:
         showtime = strftime("%Y-%m-%d %H:%M:%S", )
         getbooking = Ride_pin.objects.get(id=pk)
-        getbok = Ride.objects.get(id=getbooking.getride.id)
+        getbok = Ride.objects.get(id=getbooking.getride.id,publish='1')
         if getbok.ride_type == "C":
             if getbok.status == '0' :
                 if getbooking.status == '0':
@@ -1242,7 +1242,7 @@ def tripsetting(request,pk):
         yesterday = date - datetime.timedelta(days=1)
         tomorrow = date + datetime.timedelta(days=1)
         showtime1 = strftime("%Y-%m-%d", )
-        ride = Ride.objects.get(id=pk,date=showtime1)
+        ride = Ride.objects.get(id=pk,date=showtime1,publish='1')
         if ride:
             rr = Ride_pin.objects.filter(getride=ride.id)
             show = TripcountSerial(rr,many=True)
@@ -1264,7 +1264,7 @@ def tripsetting(request,pk):
             if ride.trip_status == 'E':
                 return Response({'status':1 ,"msg": f"Trip Complete"})
         else:
-            ride = Ride.objects.get(id=pk)
+            ride = Ride.objects.get(id=pk,publish='1')
             return Response({'status':0 ,"msg": f"Ride Date Is {ride.date}"})
     except ObjectDoesNotExist:
         return Response({'status':0 ,"msg": "Ride Date is Not Proper"})
@@ -1370,7 +1370,7 @@ def ContactUsDriver(request):
 def CurrentLoc(request,pk):
     try:
         data = request.data
-        ar = Ride.objects.filter(getdriver=pk)
+        ar = Ride.objects.filter(getdriver=pk,publish='1')
         if len(ar) > 0:    
             for i in ar:
                 if i.trip_status == 'O':
@@ -1425,7 +1425,7 @@ def GivenRatingDetailsPageFor(request,pk):
 @api_view(['GET'])
 def BidDetalis(request,pk):
     try:
-        ri = Ride.objects.get(id=pk)
+        ri = Ride.objects.get(id=pk,publish='1')
         if ri.as_user == 'Passenger':
             di = Ride_pin.objects.filter(getride1=ri.id,status='1')
             if len(di) > 0:

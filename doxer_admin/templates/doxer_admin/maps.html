@@ -41,7 +41,7 @@
     var time = '{{directions.duration}}';
     var status = '{{status|safe}}';
     var car = '{{car|safe}}';
-    var mydata = {'rid' : rideid,'time' : time, csrfmiddlewaretoken : '{{ csrf_token }}'};
+    var mydata = {'rid' : rideid, csrfmiddlewaretoken : '{{ csrf_token }}'};
     $(document).ready(function(){
       if(status == "O"){
       setInterval(function(){
@@ -58,6 +58,22 @@
           }
         });
       },1000);
+    }
+      if(status == "P"){
+        $.ajax({
+          type: "POST",
+          url: "{% url 'doxer_admin:map' %}", 
+          data : {'rid' : rideid,'time' : time, csrfmiddlewaretoken : '{{ csrf_token }}'},
+          // handle a successful response
+          success: function (data) {
+            console.log('pass');
+          },
+          error: function () {
+            console.log('fail');
+          }
+        });
+      // setInterval(function(){
+      // },1000);
     }
     });
   </script>

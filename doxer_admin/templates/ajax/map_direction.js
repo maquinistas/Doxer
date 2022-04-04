@@ -23,7 +23,6 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
                 var currentposition2 = $("#map-route").attr('currentposition2');
                 var lat = currentposition;
                     if(car == 'C'){
-                        console.log('Car');
                         var marker = new google.maps.Marker({
                             position: new google.maps.LatLng(currentposition,currentposition2),
                             draggable: true,
@@ -38,7 +37,6 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
                             draggable: true,
                         });
                     } else {
-                        console.log('Truck');
                         var marker = new google.maps.Marker({
                             position: new google.maps.LatLng(currentposition,currentposition2),
                             draggable: true,
@@ -85,9 +83,26 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
 
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-    if(status == 'E'){
-        console.log('end Trip');
-    }else{
+    if(status == 'O'){
+        var currentposition = $("#map-route").attr('currentposition');
+        var currentposition2 = $("#map-route").attr('currentposition2');
+        var origin2 = currentposition+','+currentposition2;
+        console.log('end Trip',origin2);
+        directionsService.route({
+            origin: origin2,
+            destination: destination,
+            travelMode: 'DRIVING'
+        }, function(response, status) {
+            if (status === 'OK') {
+                directionsDisplay.setDirections(response);
+            } else {
+                alert('Directions request failed due to ' + status);
+                window.location.assign("/doxer-admin/all-rides")
+            }
+        });
+    }else if(status == 'E'){
+        console.log('endtrip');
+    } else {
         directionsService.route({
             origin: origin,
             destination: destination,

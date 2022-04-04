@@ -360,7 +360,7 @@ def All_Rides(request):
                 resa['getpas'] = i.passengerid.name.capitalize()
                 resa['fees'] = f"₹ {i.fees}" 
                 resa['rid'] = rdie.id 
-                resa['ride_time'] = i.request_date
+                resa['ride_time'] = i.getride.time
                 # if i.request_date == None:
                 #     resa['ride_time'] = 'None'
                 # elif i.ride_time:
@@ -709,7 +709,8 @@ def map(request):
         rideid = request.POST.get("rid")
         timer = request.POST.get("time")
         ridesta = Ride.objects.get(id=rideid)
-        ridesta.traveling_time = timer
+        ridesta.dtime = timer
+        ridesta.publish = '1'
         ridesta.save()
         directions = Directions(
             lat_a= lat_a,
@@ -736,4 +737,3 @@ def Id_proofes(request,pk):
         print(id)
         getid = Passanger.objects.get(id=id)
         return JsonResponse({"name":getid.name.capitalize(),"id1":getid.image1.url,"id2":getid.image2.url})
-        
