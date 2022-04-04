@@ -93,7 +93,7 @@ $('.pagination li.page-item').on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='+ val.pro_image +' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
+                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='profile' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
                     });
                     };
                 },
@@ -141,11 +141,14 @@ $("#next-page").on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='+ val.pro_image +' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
+                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='profile' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
                     });
                     $(".pagination li.page-item:eq(" + (nextpage - 1 ) + ")").addClass('active');
                     $('.pagination a').removeClass('btn-info').addClass('btn-primary');
                     $('li.page-item.active a').removeClass('btn-primary').addClass('btn-info');
+                    if ($('.pagination li.active').index() == endofpage){
+                        $("#next-page").attr('disabled','True');
+                    }
                 };
             },
             error: function () {
@@ -192,11 +195,14 @@ $("#prev-page").on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='+ val.pro_image +' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
+                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='profile' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
                     });
                     $(".pagination li.page-item:eq(" + (nextpage - 1 ) + ")").addClass('active');
                     $('.pagination a').removeClass('btn-info').addClass('btn-primary');
                     $('li.page-item.active a').removeClass('btn-primary').addClass('btn-info');
+                    if($('.pagination li.active').index() === 1){
+                        $("#prev-page").attr('disabled','True');
+                    }
                     };
                 },
             error: function () {
@@ -233,7 +239,7 @@ $(document).ready(function(){
                     } else {
                         var status = '';
                     }
-                    $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='+ val.pro_image +' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
+                    $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='profile' /><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td id='"+val.id+"'>"+ status + "</td><td>" +val.id_proofe+ "</td></tr>")
                     });
                 }
             },

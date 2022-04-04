@@ -20,8 +20,6 @@ driver_per_page = 10
 passenger_per_page = 10
 rides_per_page = 10
 
-
-
 def home(request):
     if 'id' in request.session:
         showtime = strftime("%Y-%m-%d")
@@ -362,25 +360,25 @@ def All_Rides(request):
                 resa['getpas'] = i.passengerid.name.capitalize()
                 resa['fees'] = f"₹ {i.fees}" 
                 resa['rid'] = rdie.id 
-                
-                if i.request_date == None:
-                    resa['ride_time'] = 'None'
-                elif i.ride_time:
-                    time = f"{i.ride_time}"
-                    d = datetime.strptime(time, "%H:%M:%S")
-                    pas = d.strftime("%I:%M")
-                    if int(time[0:2]) < 12:
-                        if int(pas[0:1]) == 0:
-                            resa['ride_time'] = f"{pas[1:5]} a.m."
-                        else:
-                            resa['ride_time'] = f"{pas} a.m."
-                    else:
-                        if int(pas[0:1]) == 0:
-                            resa['ride_time'] = f"{pas[1:5]} p.m."
-                        else:
-                            resa['ride_time'] = f"{pas} p.m."
-                else:
-                    resa['ride_time'] = ''
+                resa['ride_time'] = i.request_date
+                # if i.request_date == None:
+                #     resa['ride_time'] = 'None'
+                # elif i.ride_time:
+                #     time = f"{i.ride_time}"
+                #     d = datetime.strptime(time, "%H:%M:%S")
+                #     pas = d.strftime("%I:%M")
+                #     if int(time[0:2]) < 12:
+                #         if int(pas[0:1]) == 0:
+                #             resa['ride_time'] = f"{pas[1:5]} a.m."
+                #         else:
+                #             resa['ride_time'] = f"{pas} a.m."
+                #     else:
+                #         if int(pas[0:1]) == 0:
+                #             resa['ride_time'] = f"{pas[1:5]} p.m."
+                #         else:
+                #             resa['ride_time'] = f"{pas} p.m."
+                # else:
+                #     resa['ride_time'] = ''
                 resa['trip_date'] = i.ride_date
                 resa['Location'] = i.pickUp.capitalize()
                 resa['destination'] = i.dropout.capitalize()

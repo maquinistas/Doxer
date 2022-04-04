@@ -784,6 +784,8 @@ def RidesBookingFilter(request,pk):
                         "dropout_longitude" : getr.dropout_longitude,
                         "dropout_address1" : getr.dropout_address1,
                         "dropout_address2" : getr.dropout_address2,
+                        "time" : getr.time,
+                        "dtime" : getr.dtime,
                         "seats": getr.seats,
                         "capacity": getr.capacity,
                         "date": getr.date,
@@ -1369,14 +1371,17 @@ def CurrentLoc(request,pk):
     try:
         data = request.data
         ar = Ride.objects.filter(getdriver=pk)
-        for i in ar:
-            if i.trip_status == 'O':
-                i.car_latitude = float(data['car_latitude']) if float(data['car_latitude']) else i.car_latitude
-                i.car_longitude = float(data['car_longitude']) if float(data['car_longitude']) else i.car_longitude
-                i.save()
-                return Response({'status':1 ,"msg": "success"})
-            else:
-                return Response({'status':0 ,"msg": "Ride Is Not The Start"})
+        if len(ar) > 0:    
+            for i in ar:
+                if i.trip_status == 'O':
+                    i.car_latitude = float(data['car_latitude']) if float(data['car_latitude']) else i.car_latitude
+                    i.car_longitude = float(data['car_longitude']) if float(data['car_longitude']) else i.car_longitude
+                    i.save()
+                    return Response({'status':1 ,"msg": "success"})
+                else:
+                    return Response({'status':0 ,"msg": "Ride Is Not The Start"})
+        else:
+            return Response({'status':0 ,"msg": "No Ride Founded"})
     except ObjectDoesNotExist:
         return Response({'status':3 ,"msg": "Fail"})
 
@@ -1437,6 +1442,8 @@ def BidDetalis(request,pk):
                     'ride_type' : ri.ride_type,
                     'trip_pas_status' : ri.trip_status,
                     'seat' : ri.seats,
+                    'time' : ri.time,
+                    'dtime' : ri.dtime,
                     'capacity' : ri.capacity,
                     'Passenger_name' : ri.getpassenger.name.capitalize(),
                     'Passenger_image' : ri.getpassenger.pro_image.url,
@@ -1455,6 +1462,8 @@ def BidDetalis(request,pk):
                     'dropout_address1' : ri.dropout_address1.capitalize(),
                     'dropout_address2' : ri.dropout_address2.capitalize(),
                     'ride_type' : ri.ride_type,
+                    'time' : ri.time,
+                    'dtime' : ri.dtime,
                     'trip_pas_status' : ri.ride_type,
                     'seat' : ri.seats,
                     'capacity' : ri.capacity,

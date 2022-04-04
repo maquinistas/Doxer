@@ -49,20 +49,17 @@ def SignUpPassanger(request):
         name = data['name'].casefold()
         raw = data['email_or_num'].casefold()
         nks =data['token']
+        password = data['password']
+        cpassword = data['cpassword']
         otp = genrateOtp()
         if(not raw):
             return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Required"})
-        
-        password = data['password']
-        cpassword = data['cpassword']
-        
         if(not password):
             return Response({'status' : 0 , 'msg' : "Password Field Is Required"})
         if(not cpassword):
             return Response({'status' : 0 , 'msg' : "Confirm Password Field Is Required"})
         
         if(re.search(mobile_pattern,raw)):
-            print("this is Num")
             em = '' 
             num = Passanger.objects.filter(contact_no=raw)
             if len(num) > 0:
@@ -85,7 +82,6 @@ def SignUpPassanger(request):
             else:
                 mo = raw     
         elif(re.search(email_pattern, raw)):
-            print("this is email")
             mo = ''
             mail = Passanger.objects.filter(email=raw)
             if len(mail) > 0:
@@ -118,8 +114,7 @@ def SignUpPassanger(request):
                 em = raw  
         else:
             return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Not Valid"})
-            
-    
+        
     if password != cpassword:
         return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
     else:
@@ -831,7 +826,7 @@ def OwnBookingFilterDetails(request,pk,pp):
         pa = Passanger.objects.get(id=pp)
         getr = Ride.objects.get(id=pk,as_user='Driver')
         getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
-        getfe = Ride_pin.objects.get(getride=pk,passengerid=pp,status__range=['0','1'])#.exclude(status='3')
+        getfe = Ride_pin.objects.get(getride=pk,passengerid=pp)#.exclude(status='3')
         sera = RidepinSerializer(getq,many=True)
         if getr.ride_type == "T":
             return Response({'status':1, 'msg':"Success",
@@ -850,8 +845,10 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "dropout_address2": getr.dropout_address2,
                             "dropout_latitude": getr.dropout_latitude,
                             "dropout_longitude": getr.dropout_longitude,
+                            "time": getr.time,
+                            "dtime": getr.dtime,
                             "trip_status": getr.trip_status,
-                            "capacity": getfe.for_parcel,
+                            "capacity": getfe.id,
                             "date": getr.date,
                             "fees": f"{getfe.fees}",
                             "add_information": getr.add_information.capitalize(),
@@ -874,6 +871,8 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "dropout_address2": getr.dropout_address2,
                             "dropout_latitude": getr.dropout_latitude,
                             "dropout_longitude": getr.dropout_longitude,
+                            "time": getr.time,
+                            "dtime": getr.dtime,
                             "seats": getfe.for_passenger,
                             "trip_status": getr.trip_status,
                             # "capacity": getfe.for_parcel,
@@ -1354,6 +1353,8 @@ def BidDetalis(request,pk):
                     'dropout_address2' : ri.dropout_address2.capitalize(),
                     'ride_type' : ri.ride_type,
                     'trip_pas_status' : ri.trip_status,
+                    # 'time' : ri.time,
+                    # 'time' : ri.time,
                     'seat' : ri.seats,
                     'capacity' : ri.capacity,
                     'Driver_name' : di[0].getdriver.name.capitalize(),

@@ -108,6 +108,7 @@ class MineRidepinSerializer(ModelSerializer):
 class GetRidepinSerializer(ModelSerializer):
     class Meta:
         model = Ride_pin
+        
     def to_representation(self, instance):
         representations = dict()
         representations['booking_id'] = instance.id
@@ -124,7 +125,8 @@ class GetRidepinSerializer(ModelSerializer):
         representations['for_passenger'] = instance.for_passenger
         representations['for_parcel'] = instance.for_parcel
         representations['request_date'] = f"{instance.ride_date}"
-        representations['ride_time'] = instance.ride_time
+        representations['ride_time'] = instance.getride.time
+        representations['ride_dtime'] = instance.getride.dtime
         representations['Location'] = instance.pickUp
         representations['Destination'] = instance.dropout
         return representations
@@ -183,6 +185,8 @@ class Filterserializer(serializers.ModelSerializer):
         representation["capacity"] = instance.capacity
         representation["pickUp"] = instance.pickUp
         representation["dropout"] = instance.dropout
+        representation["time"] = instance.time
+        representation["dtime"] = instance.dtime
         representation["date"] = instance.date
         representation["fees"] = f"{instance.fees}"
         representation["add_information"] = instance.add_information
@@ -203,6 +207,7 @@ class MultiFilterserializer(serializers.ModelSerializer):
         representation["dropout"] = instance.dropout
         representation["date"] = instance.date
         representation["time"] = instance.time
+        # representation["dtime"] = instance.dtime
         representation["fees"] = f"{instance.fees}"
         representation["add_information"] = instance.add_information
         representation["Animal"] = instance.pet_allowed
@@ -226,6 +231,8 @@ class CarRideFilterserializer(serializers.ModelSerializer):
         representation["seats"] = instance.seats
         representation["capacity"] = instance.capacity
         representation["date"] = instance.date
+        representation["time"] = instance.time
+        representation["dtime"] = instance.dtime
         representation["fees"] = instance.fees
         representation["status"] = instance.status
         representation["trip_status"] = instance.trip_status
@@ -245,6 +252,8 @@ class TruckRideFilterserializer(serializers.ModelSerializer):
         representation["trip_pas_status"] = instance.trip_status
         representation["capacity"] = instance.capacity
         representation["pickUp"] = instance.pickUp
+        representation["time"] = instance.time
+        representation["dtime"] = instance.dtime
         representation["dropout"] = instance.dropout
         representation["date"] = instance.date
         representation["fees"] = instance.fees
