@@ -28,12 +28,12 @@ def home(request):
         pas = Passanger.objects.exclude(active_ac_with_otp='0')
         pas1 = Passanger.objects.filter(status="Deactive")
         # rid = Trip.objects.filter(trip_status='E',pick_status='D',status='E').exclude(trip_status='C',pick_status='C',status='C').aggregate(total=Sum(F('fees')))
-        rid = Ride_pin.objects.filter(pas_status='E').exclude(status__range=['2','3']).aggregate(total=Sum(F('fees')))
+        rid = Ride_pin.objects.filter(pas_status='E',status='1').exclude(status='2').aggregate(total=Sum(F('fees')))
         for thevalue in rid.values():
             thevalue = thevalue
 
         # rid1 = Trip.objects.filter(today=showtime).aggregate(total=Sum(F('fees')))
-        rid1 = Ride_pin.objects.filter(pas_status='E',today=showtime).exclude(status__range=['2','3']).aggregate(total=Sum(F('fees')))
+        rid1 = Ride_pin.objects.filter(pas_status='E',status='1',today=showtime).exclude(status='2').aggregate(total=Sum(F('fees')))
         # rid1 = Trip.objects.filter(today=showtime).aggregate(total=Sum(F('fees')))
         for todayvalue in rid1.values():
             todayvalue = todayvalue
@@ -121,7 +121,7 @@ def All_Drivers(request):
                     resa['gender'] = gender
                     resa['city'] = i.city.capitalize()
                     resa['fare_per_km'] = f"{i.fare_per_km}"
-                    resa['id_proofe'] = f"<button class='btn btn-light btn-rounded btn-fw btn-sm documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></button>"
+                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
                     resa['status'] = i.status
                     results.append(resa)
 
@@ -135,7 +135,7 @@ def All_Drivers(request):
         return render(request,'doxer_admin/all_drivers.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-   
+  
 def All_Passengers(request):
     if 'id' in request.session:
         allu = Passanger.objects.exclude(active_ac_with_otp='0').order_by('-id')
@@ -184,7 +184,8 @@ def All_Passengers(request):
                         gender = ''
                     resa['gender'] = gender
                     resa['status'] = i.status
-                    resa['id_proofe'] = f"<button class='btn btn-light btn-rounded btn-fw btn-sm documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></button>"
+                    # resa['id_proofe'] = f"<button class='btn btn-light btn-rounded btn-fw btn-sm documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></button>"
+                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
                     results.append(resa)
                     if ending_number >= allu.count():
                         b = allu.count()
@@ -196,7 +197,7 @@ def All_Passengers(request):
         return render(request,'doxer_admin/all_passenger.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-    
+   
 def Accepted_Cars(request):
     if 'id' in request.session:
         allu = Vehicle.objects.filter(status='1').order_by('id')
@@ -349,44 +350,35 @@ def All_Rides(request):
             results = []
             for i in res:
                 rdie = Ride.objects.get(id=i.getride.id)
-                if i.getride.ride_type == "C":
-                    if rdie.car:
-                        car = Vehicle.objects.get(id=rdie.car.id)
-                    else:
-                        cars = 'None '
+                # if i.getride.ride_type == "C":
+                #     if rdie.car:
+                #         car = Vehicle.objects.get(id=rdie.car.id)
+                #     else:
+                #         cars = 'None '
                 resa = {}
                 resa['id'] = i.id
+                try:
+                    repor = Passenger_Report.objects.get(tri = i.id,driverid = i.getdriver.id,mine = i.passengerid.id)
+                    resa['str'] = '1'
+                except:
+                    resa['str'] = '0'
                 resa['getdr'] = i.getdriver.name.capitalize()
                 resa['getpas'] = i.passengerid.name.capitalize()
                 resa['fees'] = f"₹ {i.fees}" 
-                resa['rid'] = rdie.id 
-                resa['ride_time'] = i.getride.time
-                # if i.request_date == None:
-                #     resa['ride_time'] = 'None'
-                # elif i.ride_time:
-                #     time = f"{i.ride_time}"
-                #     d = datetime.strptime(time, "%H:%M:%S")
-                #     pas = d.strftime("%I:%M")
-                #     if int(time[0:2]) < 12:
-                #         if int(pas[0:1]) == 0:
-                #             resa['ride_time'] = f"{pas[1:5]} a.m."
-                #         else:
-                #             resa['ride_time'] = f"{pas} a.m."
-                #     else:
-                #         if int(pas[0:1]) == 0:
-                #             resa['ride_time'] = f"{pas[1:5]} p.m."
-                #         else:
-                #             resa['ride_time'] = f"{pas} p.m."
-                # else:
-                #     resa['ride_time'] = ''
+                resa['rid'] = rdie.id
+                if i.as_user == '	Passenger_bid':
+                    resa['ride_time'] = i.getride.time
+                else:
+                    resa['ride_time'] = i.getride.dtime
                 resa['trip_date'] = i.ride_date
                 resa['Location'] = i.pickUp.capitalize()
                 resa['destination'] = i.dropout.capitalize()
                 if i.getride.ride_type == "C":
-                    if rdie.car:
-                        resa['vehicle'] = f"{car.vehical_variant.brand.brand} {car.vehical_variant.cars}<br><br>{car.reg_num.upper()} <br><br> {car.vehicle_color.capitalize()}"
-                    else:
-                        resa['vehicle'] = 'None'
+                    resa['vehicle'] = f"{i.car.vehical_variant.brand.brand} {i.car.vehical_variant.cars}<br><br>{i.car.reg_num.upper()} <br><br> {i.car.vehicle_color.capitalize()}"
+                #     if rdie.car:
+                #         resa['vehicle'] = f"{i.car.vehical_variant.brand.brand} {car.vehical_variant.cars}<br><br>{car.reg_num.upper()} <br><br> {car.vehicle_color.capitalize()}"
+                #     else:
+                #         resa['vehicle'] = 'None'
                 else:
                     resa['vehicle'] = "Truck"
                 if i.pas_status == 'W' and rdie.trip_status == 'P':
@@ -709,9 +701,14 @@ def map(request):
         rideid = request.POST.get("rid")
         timer = request.POST.get("time")
         ridesta = Ride.objects.get(id=rideid)
-        ridesta.dtime = timer
-        ridesta.publish = '1'
-        ridesta.save()
+        if ridesta.status == '0' and ridesta.publish == '0':
+            ridesta.dtime = timer
+            ridesta.publish = '1'
+            print("Save And realese")
+            ridesta.save()
+        # rides = Ride.objects.filter(publish='0')
+        # for i in rides:
+        #     i.delete()
         directions = Directions(
             lat_a= lat_a,
             long_a=long_a,

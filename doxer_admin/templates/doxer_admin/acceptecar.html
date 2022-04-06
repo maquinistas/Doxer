@@ -29,7 +29,7 @@
                   <div class="card-body">
                     <ul class="breadcrumb justify-content-center">
                         <li><a class='btn btn-sm btn-primary btn-rounded' href="{% url 'doxer_admin:allcars' %}">Pending</a>&nbsp;</li>
-                        <li><a class='btn btn-sm btn-info btn-rounded' href='javascript:void(0);'>Accept</a>&nbsp;</li>
+                        <li><a class='btn btn-sm btn-info btn-rounded' href='javascript:void(0);'>Accepted</a>&nbsp;</li>
                     </ul>
                   <table class="table table-hover">
                       <thead>
@@ -40,10 +40,11 @@
                             <th class="font-weight-bold"> Vehicle Variant </th>
                             <th class="font-weight-bold"> Vehicle Color </th>
                             <th class="font-weight-bold"> Status </th>
-                            <th class="font-weight-bold"><center> Action </center></th>
+                            {% comment %} <th class="font-weight-bold"><center> Action </center></th> {% endcomment %}
                         </tr>
                       </thead>
                       <tbody id="tests-table">
+                        
                       </tbody>
                     </table>
                   </div>
@@ -60,7 +61,7 @@
               </div>
             </div>
           </div>
-          <div class="modal fade" id="Accept" tabindex="-1" role="dialog" aria-labelledby="my_modalLabel">
+          {% comment %} <div class="modal fade" id="Accept" tabindex="-1" role="dialog" aria-labelledby="my_modalLabel">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
@@ -99,7 +100,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
           <!-- content-wrapper ends -->
       <!-- partial:../../partials/_footer.html -->
       {% include 'home/foot.html' %}

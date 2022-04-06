@@ -39,6 +39,10 @@ def genrateOtp():
 #  |        |      |     
 #  |        |      |  
 
+def Average(l): 
+    avg = sum(l) / len(l) 
+    return avg
+
 @api_view(['POST'])
 def SignUpPassanger(request):
     if request.method  == "POST":
@@ -515,6 +519,7 @@ def RequestForRide(request,pid,rid):
                     ride_time = ridegid.time,
                     for_passenger = pas,
                     fees = muls,
+                    car = ridegid.car,
                     pickUp = ridegid.pickUp,
                     dropout = ridegid.dropout,
                     for_parcel = par,
@@ -559,12 +564,13 @@ def RejectRequestForTripByPassenger(request,pk):
     except ObjectDoesNotExist:
         return Response({"status" : "0",'msg': "Wrong Id"})
 
-# Passanger Own Requestes
 @api_view(['GET'])
 def ViewPassengerRide(request,pk):
     try:
         getpas = Ride.objects.get(id=pk,publish='1')
-        getreq = Ride_pin.objects.filter(getride1=getpas.id,status='0',as_user='Driver_bid')
+        print(getpas)
+        getreq = Ride_pin.objects.filter(getride=getpas.id,status='0',as_user='Driver_bid')
+        print(getreq)
         sr = BookingpinSerializer(getreq,many=True)
         return Response({'status': 1, 'msg': 'success',
                         'data' : sr.data})
@@ -575,8 +581,30 @@ def ViewPassengerRide(request,pk):
 def PassengerProfile(request,pk):
     try:
         pas = Passanger.objects.get(id=pk)
-        serializer = getPassangerSerializer(pas)
-        return Response(serializer.data)
+        # serializer = getPassangerSerializer(pas)
+        rat = Passenger_Rating.objects.filter(mine=pk)
+        ls = []
+        for i in rat:
+            ls.append(int(i.rates))
+        print(ls)
+        if ls == []:
+            average = 0.0
+        else:
+            average = Average(ls) 
+        serializer = {
+            'status' : 1,
+            'msg' : "success",
+            "username" : pas.name.capitalize(),
+            "email" : pas.email,
+            "pro_image" : pas.pro_image.url,
+            "contact_no" : pas.contact_no,
+            "gender" : pas.gender,
+            "dob" : pas.dob,
+            "city" : pas.city,
+            "review" : average,
+            "bio" : pas.bio,
+        }
+        return Response(serializer)
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
 
@@ -587,7 +615,7 @@ def SearchForRide(request,dd):
     dropout = data["dropout"]
     date = data["date"]  
     if pickup and dropout:
-        pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp=pickup,dropout=dropout,date=date,status='0',trip_status='P',as_user = 'Driver').exclude(status='3')
+        pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp=pickup,dropout=dropout,date=date,trip_status='P',as_user = 'Driver').exclude(status='3')
         if len(pp) > 0:
             serial = Filterserializer(pp,many=True)
             return Response({'status':1 ,"msg":"Success", 'data':serial.data})    
@@ -680,8 +708,8 @@ def PassengerChangePassword(request,pk):
 def PassengerAddBooking(request,pk):
     try:
         data = request.data
-        pickUp = data["pickUp"]
-        dropout = data["dropout"]
+        pickUp = data["pickUp"].casefold()
+        dropout = data["dropout"].casefold()
         pickUp_lat = data["pickUp_lat"]
         dropout_lat = data["dropout_lat"]
         pickUp_lan = data["pickUp_lan"]
@@ -694,6 +722,8 @@ def PassengerAddBooking(request,pk):
         pickup_address2 = data['pickup_address2']
         dropout_address1 = data['dropout_address1']
         dropout_address2 = data['dropout_address2']
+        
+        print(f'{dropout_address1}\n{dropout_address2}')
         showtime = strftime("%Y-%m-%d %H:%M:%S", )
         getpas = Passanger.objects.get(id=pk)
         getname = getpas.name if getpas.name else getpas.email_or_num 
@@ -712,6 +742,8 @@ def PassengerAddBooking(request,pk):
         
         if(not pickUp):
             return Response({'status':0,'msg': 'PickUp Is Not Added..'})
+        if(not date):
+            return Response({'status':0,'msg': 'Please Select Date For Ride'})
         if(not dropout):
             return Response({'status':0,'msg': 'Dropout Is Not Added..'})
         if(not date):
@@ -725,6 +757,8 @@ def PassengerAddBooking(request,pk):
             ride_type = typ,
             pickUp_latitude = pickUp_lat,
             pickUp_longitude = pickUp_lan,
+            car_latitude = pickUp_lat,
+            car_longitude = pickUp_lan,
             dropout_latitude = dropout_lat,
             dropout_longitude = dropout_lan,
             pickup_address1 = pickup_address1,
@@ -749,26 +783,28 @@ def PassengerAddBooking(request,pk):
 @api_view(['POST'])
 def BookingPublishedStop(request,pk):
     try:
-        rde = Ride.objects.get(id=pk,publish='1')
-        bookingpin = Ride_pin.objects.filter(getbooking=pk)
-        for i in bookingpin:
-            if i.status == '1':
-                i.staus = '3'
-            i.status = '3'
-            i.save()
-        rde.status = '3'
-        rde.save()
-        return Response({"status" : 1,'msg': "Ride Request stop"})
+        rde = Ride.objects.get(id=pk,publish='1',as_user='Passenger')
+        bookingpin = Ride_pin.objects.filter(getride=pk)
+        if rde.trip_status == 'P':
+            for i in bookingpin:
+                if i.status == '1':
+                    i.staus = '3'
+                i.status = '3'
+                i.save()
+            rde.status = '3'
+            rde.delete()
+            
+            return Response({"status" : 1,'msg': "Ride Request stop"})
+        else:
+            return Response({"status" : 0,'msg': "Ride Is Not Stop"})
     except ObjectDoesNotExist:
         return Response({"status" : 0,'msg': "Ride Request Not found"})
 
-# I'm Get My Ride Listing Now
 @api_view(['GET'])
 def PassengerRideList(request,pk):
     try:
         getpas = Passanger.objects.get(id=pk)
         bb = Ride.objects.filter(getpassenger=pk,publish='1').exclude(status='3')
-        print(bb)
         lis = []
         for i in bb:
             if i.status == '0' or i.status == '1':
@@ -777,8 +813,8 @@ def PassengerRideList(request,pk):
                 representation["id"] = i.id
                 representation["Passanger_Id"] = i.getpassenger.id
                 representation["Passenger_name"] = i.getpassenger.name
-                representation["pickUp"] = i.pickUp
-                representation["dropout"] = i.dropout
+                representation["pickUp"] = i.pickUp.capitalize()
+                representation["dropout"] = i.dropout.capitalize()
                 representation["date"] = i.date
                 representation["time"] = i.time
                 representation["dtime"] = i.dtime
@@ -789,10 +825,10 @@ def PassengerRideList(request,pk):
                         representation["Driver_name"] = bb2.getdriver.name
                         representation["Driver_Image"] = bb2.getdriver.pro_image.url
                         representation["offer_price"] = bb2.offer_price
-                        if bb2.pas_status == "W":
-                            representation["trip_pas_status"] = "P"
-                        else:
-                            representation["trip_pas_status"] = bb2.pas_status
+                        # if bb2.pas_status == "W":
+                        #     representation["trip_pas_status"] = "P"
+                        # else:
+                        #     representation["trip_pas_status"] = bb2.pas_status
                 representation["Passengers"] = i.seats
                 representation["Parcels"] = i.capacity
                 lis.append(representation)
@@ -826,7 +862,7 @@ def OwnBookingFilterDetails(request,pk,pp):
         pa = Passanger.objects.get(id=pp)
         getr = Ride.objects.get(id=pk,as_user='Driver',publish='1')
         getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
-        getfe = Ride_pin.objects.get(getride=pk,passengerid=pp)#.exclude(status='3')
+        getfe = Ride_pin.objects.filter(getride=pk,passengerid=pp).exclude(status='2')
         sera = RidepinSerializer(getq,many=True)
         if getr.ride_type == "T":
             return Response({'status':1, 'msg':"Success",
@@ -848,9 +884,9 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "time": getr.time,
                             "dtime": getr.dtime,
                             "trip_status": getr.trip_status,
-                            "capacity": getfe.id,
+                            "capacity": getfe[0].id,
                             "date": getr.date,
-                            "fees": f"{getfe.fees}",
+                            "fees": f"{getfe[0].fees}",
                             "add_information": getr.add_information.capitalize(),
                             'data' : sera.data
                             })
@@ -873,11 +909,11 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "dropout_longitude": getr.dropout_longitude,
                             "time": getr.time,
                             "dtime": getr.dtime,
-                            "seats": getfe.for_passenger,
+                            "seats": getfe[0].for_passenger,
                             "trip_status": getr.trip_status,
                             # "capacity": getfe.for_parcel,
                             "date": getr.date,
-                            "fees": f"{getfe.fees}",
+                            "fees": f"{getfe[0].fees}",
                             "add_information": getr.add_information.capitalize(),
                             'data' : sera.data
                             })
@@ -895,15 +931,23 @@ def PassengerGiveRating(request,Rid,pp):
         getride = Ride.objects.get(id=Rid,publish='1')
         getpas = Passanger.objects.get(id=pp)
         getdri = Driver.objects.get(id=getride.getdriver.id)  
-        rat = Drivers_Rating.objects.create(
+        rate = Drivers_Rating.objects.filter(
             mine = getdri,
             tri = getride,
             passengerid = getpas,
-            rates = rat,
-            review = review,
-            create = showtime,
         )
-        return Response({'status':1,'msg' : 'Rating Add Successfully'})
+        if len(rate) > 0:
+            return Response({'status':0,'msg' : 'Rating has been Given'})
+        else:
+            rat = Drivers_Rating.objects.create(
+                mine = getdri,
+                tri = getride,
+                passengerid = getpas,
+                rates = rat,
+                review = review,
+                create = showtime,
+            )
+            return Response({'status':1,'msg' : 'Rating Add Successfully'})
     except ObjectDoesNotExist:
             return Response({'status':0,'msg' : 'Trip Id Is Not Found'})
 
@@ -1201,10 +1245,11 @@ def CancelBooking(request,pk):
 @api_view(['POST'])
 def ReportDriverBehavior(request,Rid,pk):
     try:
-        showtime = strftime("%Y-%m-%d %H:%M:%S")
+        showtime = strftime("%Y-%m-%d")
         data = request.data
         report_text = data["report_text"]
         getride = Ride.objects.get(id=Rid,publish='1')
+        ridepin = Ride_pin.objects.get(getride=Rid,passengerid=pk)
         getpas = Passanger.objects.get(id=pk)
         getdri = Driver.objects.get(id=getride.getdriver.id)    
         rat = Driver_Report.objects.create(
@@ -1214,9 +1259,9 @@ def ReportDriverBehavior(request,Rid,pk):
             report_text = report_text,
             create = showtime,
         )
-        getride.pas_status = "E"
-        getride.save()
-        return Response({'status':1,'msg' : 'Report Add Successfully'})
+        ridepin.pas_status = "E"
+        ridepin.save()
+        return Response({'status':1,'msg' : 'Report Successfully'})
     except ObjectDoesNotExist:
         return Response({'status':0,'msg' : 'Ride Is Not Found'})
 
@@ -1339,7 +1384,7 @@ def BidDetalis(request,pk):
     try:
         ri = Ride.objects.get(id=pk,publish='1')
         if ri.as_user == 'Passenger':
-            di = Ride_pin.objects.filter(getride1=ri.id,status='1')
+            di = Ride_pin.objects.filter(getride=ri.id,status='1',as_user='Driver_bid')
             if len(di)>0:
                 context = {
                     'status':1,
@@ -1353,8 +1398,8 @@ def BidDetalis(request,pk):
                     'dropout_address2' : ri.dropout_address2.capitalize(),
                     'ride_type' : ri.ride_type,
                     'trip_pas_status' : ri.trip_status,
-                    # 'time' : ri.time,
-                    # 'time' : ri.time,
+                    'time' : ri.time,
+                    'dtime' : ri.dtime,
                     'seat' : ri.seats,
                     'capacity' : ri.capacity,
                     'Driver_name' : di[0].getdriver.name.capitalize(),
@@ -1374,8 +1419,10 @@ def BidDetalis(request,pk):
                     'dropout_address1' : ri.dropout_address1.capitalize(),
                     'dropout_address2' : ri.dropout_address2.capitalize(),
                     'ride_type' : ri.ride_type,
-                    'trip_pas_status' : ri.ride_type,
+                    'trip_pas_status' : ri.trip_status,
                     'seat' : ri.seats,
+                    'time' : ri.time,
+                    'dtime' : ri.dtime,
                     'capacity' : ri.capacity,
                     'Driver_name' : '',
                     'Driver_image' : '',

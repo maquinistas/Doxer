@@ -7,29 +7,30 @@ from .models import *
 #         model = Cities
 #         fields = ['id','name']
 
-class getPassangerSerializer(ModelSerializer):
-    class Meta:
-        model = Passanger
+# class getPassangerSerializer(ModelSerializer):
+#     class Meta:
+#         model = Passanger
         
-    def to_representation(self, instance):
-        representation = dict()
-        representation["username"] = instance.name
-        representation["email"] = instance.email
-        representation["pro_image"] = instance.pro_image.url
-        representation["contact_no"] = instance.contact_no
-        if instance.gender == 'M':
-            representation["gender"] = 'Male'
-        elif instance.gender == 'F':
-            representation["gender"] = 'Female'
-        elif instance.gender == 'O':
-            representation["gender"] = 'Other'
-        else:
-            representation["gender"] = ''
-        representation["dob"] = instance.dob
-        representation["city"] = instance.city
-        representation["bio"] = instance.bio
+#     def to_representation(self, instance):
+#         representation = dict()
+#         representation["username"] = instance.name
+#         representation["email"] = instance.email
+#         representation["pro_image"] = instance.pro_image.url
+#         representation["contact_no"] = instance.contact_no
+#         if instance.gender == 'M':
+#             representation["gender"] = 'Male'
+#         elif instance.gender == 'F':
+#             representation["gender"] = 'Female'
+#         elif instance.gender == 'O':
+#             representation["gender"] = 'Other'
+#         else:
+#             representation["gender"] = ''
+#         representation["dob"] = instance.dob
+#         # representation["rating"] = instance.
+#         representation["city"] = instance.city
+#         representation["bio"] = instance.bio
         
-        return representation
+#         return representation
         
 class RideSerializer(ModelSerializer):
     class Meta:
@@ -97,6 +98,7 @@ class MineRidepinSerializer(ModelSerializer):
         representations["Driver_Token"] = instance.getdriver.ntk
         representations["Passenger_Token"] = instance.passengerid.ntk
         representations['Location'] = instance.pickUp
+        representations['fees'] = f"{instance.fees}"
         representations['Location_latitude'] = instance.pickUp_latitude
         representations['Location_longitude'] = instance.pickUp_longitude
         representations['Destination'] = instance.dropout
@@ -134,8 +136,7 @@ class GetRidepinSerializer(ModelSerializer):
 class BookingpinSerializer(ModelSerializer):
     class Meta:
         model = Ride_pin
-        fields = "__all__"
-    
+        
     def to_representation(self, instance):
         representation = dict()
         representation["id"] = instance.id
@@ -144,6 +145,7 @@ class BookingpinSerializer(ModelSerializer):
         representation["Driver_pro_image"] = instance.getdriver.pro_image.url
         representation["pickUp"] = instance.pickUp
         representation["dropout"] = instance.dropout
+        representation["car"] = f"{instance.car.vehical_variant.brand.brand} , {instance.car.vehical_variant.cars}"
         representation["offer_price"] = instance.offer_price
         representation["req_date"] = instance.request_date
         representation["status"] = instance.status
@@ -156,14 +158,21 @@ class DriverBookingpinSerializer(ModelSerializer):
     
     def to_representation(self, instance):
         representation = dict()
+        representation["id"] = instance.id
         representation["rid"] = instance.getride.id
         representation["trip_pas_status"] = instance.getride.trip_status
-        representation["id"] = instance.id
-        representation["Passenger_id"] = instance.passengerid.id
-        representation["Passenger_name"] = instance.passengerid.name
-        representation["Passenger_pro_image"] = instance.passengerid.pro_image.url
+        if instance.status == '1':
+            representation["Passenger_id"] = instance.passengerid.id
+            representation["Passenger_name"] = instance.passengerid.name
+            representation["Passenger_pro_image"] = instance.passengerid.pro_image.url
+        else:
+            representation["Passenger_id"] = ''
+            representation["Passenger_name"] = ''
+            representation["Passenger_pro_image"] = ""
         representation["pickUp"] = instance.pickUp.capitalize()
         representation["dropout"] = instance.dropout.capitalize()
+        representation["time"] = instance.getride.time
+        representation["dtime"] = instance.getride.dtime
         representation["Passenger"] = instance.for_passenger
         representation["Parcel"] = instance.for_parcel
         representation["offer_price"] = f"{instance.offer_price}"
@@ -226,8 +235,8 @@ class CarRideFilterserializer(serializers.ModelSerializer):
         representation["id"] = instance.id
         representation["driver"] = instance.getdriver.name
         representation["Profile"] = instance.getdriver.pro_image.url
-        representation["pickUp"] = instance.pickUp
-        representation["dropout"] = instance.dropout
+        representation["pickUp"] = instance.pickUp.capitalize()
+        representation["dropout"] = instance.dropout.capitalize()
         representation["seats"] = instance.seats
         representation["capacity"] = instance.capacity
         representation["date"] = instance.date

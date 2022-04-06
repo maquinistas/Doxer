@@ -49,8 +49,14 @@ $('.pagination li.page-item').on('click',function(){
                     $.each(data.results, function(i, val) {
                         //append to post
                         for(var j=1 ; j <= i ; j++){j};
-                        
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
+                        if(val.str == "1"){
+                            console.log('1');
+                            var tr = "table-danger";
+                        }else{
+                            console.log('0');
+                            var tr = "";
+                        }
+                        $('#tests-table').append("<tr class='"+ tr +"'><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
                         });
                     };
                 },
@@ -91,8 +97,14 @@ $("#next-page").on('click',function(){
                     $.each(data.results, function(i, val) {
                         //append to post
                         for(var j=1 ; j <= i ; j++){j};
-
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
+                        if(val.str == "1"){
+                            console.log('1');
+                            var tr = "table-danger";
+                        }else{
+                            console.log('0');
+                            var tr = "";
+                        }
+                        $('#tests-table').append("<tr class='"+ tr +"'><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
                         });
                     $(".pagination li.page-item:eq(" + (nextpage - 1 ) + ")").addClass('active');
                     $('.pagination a').removeClass('btn-info').addClass('btn-primary');
@@ -139,8 +151,14 @@ $("#prev-page").on('click',function(){
                     $.each(data.results, function(i, val) {
                         //append to post
                         for(var j=1 ; j <= i ; j++){j};
-                        
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
+                        if(val.str == "1"){
+                            console.log('1');
+                            var tr = "table-danger";
+                        }else{
+                            console.log('0');
+                            var tr = "";
+                        }
+                        $('#tests-table').append("<tr class='"+ tr +"'><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
                         });
                     $(".pagination li.page-item:eq(" + (nextpage - 1 ) + ")").addClass('active');
                     $('.pagination a').removeClass('btn-info').addClass('btn-primary');
@@ -178,9 +196,16 @@ $(document).ready(function(){
                 $('.pagination ').fadeIn();
                 $.each(data.results, function(i, val) {
                     //append to post
-                    for(var j=1 ; j <= i ; j++){j};
-                    $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
+                    if(val.str == "1"){
+                        console.log('1');
+                        var tr = "table-danger";
+                    }else{
+                        console.log('0');
+                        var tr = "";
+                    }                    
+                    $('#tests-table').append("<tr class='"+ tr +"'><td> # " + val.id  + "</td><td>" + val.trip_date + "<br><br>"+val.ride_time+"</td><td>" + val.getdr + "</td><td>"+ val.getpas +"</td><td>"+ val.vehicle +"</td><td>" + val.Location + "<br><br>" + val.destination + "</td><td><center>"+ val.status +"</center></td><th>  "+ val.fees + "</th><td><center><button class='btn btn-primary btn-rounded btn-sm' id='pleaseclickme' data='"+val.rid+"'><i class='icon-direction btn-icon-append'></i></button></td></tr>")
                     });
+                    for(var j=1 ; j <= i ; j++){j};
                 }
             },
             error: function () {

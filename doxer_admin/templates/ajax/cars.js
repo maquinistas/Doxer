@@ -30,6 +30,9 @@ $(".accept-car").on('click',function(){
         method : "POST",
         data : mydata,
         success : function(data){
+            $("#et1").text(data.a);
+            $("#et2").text(data.b);
+            $("#totale").text(data.t);
             if (data.status==1){
                 setTimeout(function() {
                     $('#Accept').modal('hide');
@@ -88,6 +91,11 @@ $(".reject-car").on('click',function(){
         method : "POST",
         data : mydata,
         success : function(data){
+            $("#et1").text(data.a);
+            console.log('data a',data);
+            console.log('data a',data.b);
+            $("#et2").text(data.b);
+            $("#totale").text(data.t);
             if (data.status==1){
                 setTimeout(function() {
                     $('#Reject').modal('hide');

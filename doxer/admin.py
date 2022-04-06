@@ -9,7 +9,7 @@ class Driveradmin(admin.ModelAdmin):
     list_display_links = ('id','name', 'email', 'contact_no', 'gender', 'city', 'otp', 'create_at', 'update_at')
     list_filter = ('gender'),
     ordering = ('id'),
-    search_fields = ('name','gender')
+    search_fields = ('name','email','contact_no')
 
 class Passangerradmin(admin.ModelAdmin):
     list_per_page = 15 # No of records per page 
@@ -17,7 +17,7 @@ class Passangerradmin(admin.ModelAdmin):
     list_display_links = ('id','name', 'email', 'contact_no', 'gender', 'city', 'otp', 'create', 'update')
     list_filter = ('gender'),
     ordering = ('id'),
-    search_fields = ('name','gender')
+    search_fields = ('name','email','contact_no')
 
 class bookingadmin(admin.ModelAdmin):
     list_per_page = 15 # No of records per page 

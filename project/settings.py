@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Pip Installed Apps
+    # Installed Apps
     'rest_framework',
 
     # Project Create Apps
@@ -175,7 +175,10 @@ MESSAGE_TAG = {
 
 # Image Or Path Url
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_files')]
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "static_media")

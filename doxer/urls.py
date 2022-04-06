@@ -46,13 +46,13 @@ driverurl = [
     path(r"driver-list-of-rating-<str:pk>/",driver.DriverGetRating),#done
     path(r"driver-driven-of-rating-<str:pk>/",driver.DriverDrivenRatingList),#done    
     path(r"driver-trip/<str:pk>/",driver.tripsetting),   
-    path(r"driver-pick-drop-passenger/<str:pk>/",driver.pickstatus),   
+    # path(r"driver-pick-drop-passenger/<str:pk>/",driver.pickstatus),   
     path(r"driver-cars-list/<str:pk>/",driver.MyCars),   
     path(r"driver-contact-us/",driver.ContactUsDriver),   
     path(r"driver-current-loction/<str:pk>/",driver.CurrentLoc),   
     path(r"driver-RatingDetailsPageForRecieve/<str:pk>/",driver.RatingDetailsPageForRecieve),   
     path(r"driver-GivenRatingDetailsPageFor/<str:pk>/",driver.GivenRatingDetailsPageFor),   
-    path(r"driver-BidDetalis/<str:pk>/",driver.BidDetalis),   
+    path(r"driver-BidDetalis/<str:pk>/<str:dd>/",driver.BidDetalis),   
 ]
 
 # Passenger
