@@ -4302,6 +4302,8 @@ pre code {
 
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: #ecf0f4;
+    cursor: pointer;
+    user-select: none;
 }
 
 .table-hover tbody tr:hover {
@@ -4429,7 +4431,7 @@ pre code {
 .table-danger td,
 .table-danger thead th,
 .table-danger tbody+tbody {
-    border-color: #ffa2b2;
+    /* border-color: #ffa2b2; */
 }
 
 .table-hover .table-danger:hover {

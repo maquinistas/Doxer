@@ -446,7 +446,7 @@ def AddRideForCar(request,pk):
         getdriver.fare_per_km = per_price
         getdriver.save()
         
-        fees = int(km) * int(per_price)
+        fees = round(float(km)) * int(per_price)
         
         cars = Vehicle.objects.get(id=ca)
         getname = getdriver.name if getdriver.name else getdriver.email_or_num
@@ -474,46 +474,81 @@ def AddRideForCar(request,pk):
         if(not fees):
             return Response({'status':0,'msg':'KM Is Required'})
 
-        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,time = time,publish='1')
+        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,publish='1')
         if len(rideserach) > 0:
             return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
         else:
-            addrid = Ride.objects.create(
+            addrsd = Ride.objects.filter(
                 as_user = 'Driver',
                 getdriver = getdriver,
-                pickUp_latitude = pickUp_latitude,
-                pickUp_longitude = pickUp_longitude,
-                car_latitude = pickUp_latitude,
-                car_longitude = pickUp_longitude,
-                dropout_latitude = dropout_latitude,
-                dropout_longitude = dropout_longitude,
                 pickUp = pick,
                 dropout = drop,
                 date = date,
                 car = cars,
-                time = time,
-                dtime = dtime,
                 ride_type = "C",
-                capacity = capacity,
-                seats = seats,
-                Max_seats = seats,
-                fees = fees,
-                pickup_address1 = pickup_address1,
-                pickup_address2 = pickup_address2,
-                dropout_address1 = dropout_address1,
-                dropout_address2 = dropout_address2,
-                # pet_allowed = pet,
-                # max_seat_in_back = seatinback,
-                # smoke_allowed = smoke,
-                add_information = add_information,
-                create_at = showtime,
-                update_at = showtime
+                publish = "0"
             )
-            return Response({
-                "Ride_Id" : addrid.id,
-                "status":1,
-                "msg":"Ride Added Successfully"
-                })
+            if len(addrsd) > 0:
+                addrsd[0].pickUp_latitude = pickUp_latitude
+                addrsd[0].pickUp_longitude = pickUp_longitude
+                addrsd[0].car_latitude = pickUp_latitude
+                addrsd[0].car_longitude = pickUp_longitude
+                addrsd[0].dropout_latitude = dropout_latitude
+                addrsd[0].dropout_longitude = dropout_longitude
+                addrsd[0].capacity = capacity
+                addrsd[0].seats = seats
+                addrsd[0].Max_seats = seats
+                addrsd[0].fees = fees
+                addrsd[0].pickup_address1 = pickup_address1
+                addrsd[0].pickup_address2 = pickup_address2
+                addrsd[0].dropout_address1 = dropout_address1
+                addrsd[0].dropout_address2 = dropout_address2
+                addrsd[0].add_information = add_information
+                addrsd[0].create_at = showtime
+                addrsd[0].update_at = showtime
+                addrsd[0].save()
+                return Response({
+                    "Ride_Id" : addrsd[0].id,
+                    "status":1,
+                    "msg":"Ride Added Successfully"
+                    })
+            else:
+                addrid = Ride.objects.create(
+                    as_user = 'Driver',
+                    getdriver = getdriver,
+                    pickUp_latitude = pickUp_latitude,
+                    pickUp_longitude = pickUp_longitude,
+                    car_latitude = pickUp_latitude,
+                    car_longitude = pickUp_longitude,
+                    dropout_latitude = dropout_latitude,
+                    dropout_longitude = dropout_longitude,
+                    pickUp = pick,
+                    dropout = drop,
+                    date = date,
+                    car = cars,
+                    time = time,
+                    dtime = dtime,
+                    ride_type = "C",
+                    capacity = capacity,
+                    seats = seats,
+                    Max_seats = seats,
+                    fees = fees,
+                    pickup_address1 = pickup_address1,
+                    pickup_address2 = pickup_address2,
+                    dropout_address1 = dropout_address1,
+                    dropout_address2 = dropout_address2,
+                    # pet_allowed = pet,
+                    # max_seat_in_back = seatinback,
+                    # smoke_allowed = smoke,
+                    add_information = add_information,
+                    create_at = showtime,
+                    update_at = showtime
+                )
+                return Response({
+                    "Ride_Id" : addrid.id,
+                    "status":1,
+                    "msg":"Ride Added Successfully"
+                    })
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong Or Data Missing"})
 
@@ -944,10 +979,10 @@ def DriverAddCar(request,pk,mid):
 @api_view(['POST'])
 def SerchBookingFilter(request,dd,pk):
     data = request.data
-    pick = data['pickUp']
-    drop = data['dropout']
+    pick = data['pickUp'].casefold()
+    drop = data['dropout'].casefold()
     date = data['date']
-    book = Ride.objects.filter(ride_type=dd,pickUp=pick,dropout=drop,date=date,as_user="Passenger",publish='1',trip_status='P')
+    book = Ride.objects.filter(ride_type=dd,pickUp__startswith=pick,dropout__startswith=drop,date=date,as_user="Passenger",publish='1',trip_status='P')
     if len(book) > 0:
         lis = []
         for i in book:
@@ -1306,9 +1341,20 @@ def tripsetting(request,pk):
                 return Response({'status':1 ,"msg": f"Trip Complete"})
         else:
             ride = Ride.objects.get(id=pk,publish='1')
-            return Response({'status':0 ,"msg": f"Ride couldn't be able to start as it is on {ride.date}"})
+            value = True
+            i = 0
+            while (value):
+                yesterday = date - datetime.timedelta(days=i)
+                tomorrow = date + datetime.timedelta(days=i)
+                i = i + 1
+                if str(ride.date) == str(yesterday):
+                    value = False
+                    return Response({'status':0 ,"msg": f"This Ride Date Has A Previous Date {ride.date} which is Gone before {i} days Ago", "ride_date" : ride.date,"days" : i})
+                if str(ride.date) == str(tomorrow):
+                    return Response({'status':0 ,"msg": f"Ride couldn't be able to start as it is on {ride.date} Please Come Again After {i} days", "ride_date" : ride.date,"days" : i})
+                    value = False      
     except ObjectDoesNotExist:
-        return Response({'status':0 ,"msg": "Ride Date is Not Proper"})
+        return Response({'status':0 ,"msg": "Something Wrong"})
 
 @api_view(['GET'])
 def MyCars(request,pk):

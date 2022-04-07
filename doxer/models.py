@@ -96,10 +96,14 @@ class Passanger(models.Model):
 #     create = models.DateTimeField(blank=True,null=True)
 #     update = models.DateTimeField(blank=True,null=True)
     
-# class Cities(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     name = models.CharField(max_length=255)
-
+class Cities(models.Model):
+    name = models.CharField(max_length=255)
+    class Meta:
+        ordering = ['name']
+        
+    def __str__(self):
+        return self.name
+    
 class Ride(models.Model):
     as_user = models.CharField(max_length=255,blank=True,null=True)
     getdriver = models.ForeignKey(Driver, on_delete=models.CASCADE,null=True,blank=True)

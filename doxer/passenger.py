@@ -33,15 +33,16 @@ def genrateOtp():
         OTP += digits[math.floor(random.random()*10)]
     return OTP
 
+def Average(l): 
+    avg = sum(l) / len(l) 
+    return avg
+
 #   ____      ____   
 #  |    \    /    \     
 #  |____/   |______|     
 #  |        |      |     
 #  |        |      |  
 
-def Average(l): 
-    avg = sum(l) / len(l) 
-    return avg
 
 @api_view(['POST'])
 def SignUpPassanger(request):
@@ -405,11 +406,11 @@ def ForgotSetNewPasswordPassenger(request):
 @api_view(['PUT'])
 def UpdatePassenger(request,pk):
     try:
+        getpas = Passanger.objects.get(id=pk)
+        # if request.data:
         data = request.data
         showtime = strftime("%Y-%m-%d %H:%M:%S", )
-        getpas = Passanger.objects.get(id=pk)
         getpas.name = data['username'] if data['username'] else getpas.name
-        getpas.email_or_num = getpas.email if getpas.email else getpas.contact_no
         try:
             getdr1 = data['pro_image']# if data['pro_image'] else  getdr.pro_image
             ex = getdr1.name
@@ -425,7 +426,6 @@ def UpdatePassenger(request,pk):
                 return Response({"status": 0, "msg" : "File Formate use jpg,jpeg,png"})
         except:
             getpas.pro_image = getpas.pro_image
-        # getpas.pro_image = data['pro_image'] if data['pro_image'] else getpas.pro_image
         email = data['email']
         num = data['contact_no']    
         if(re.search(email_pattern, email)):
@@ -466,7 +466,7 @@ def UpdatePassenger(request,pk):
         getpas.update = showtime
         getpas.save()
         name = getpas.name if getpas.name else getpas.email_or_num
-        return Response({"status" : "1",'msg': f"'{name}' Passenger Is Updated","Driver Id" : getpas.id})
+        return Response({"status" : "1",'msg': f"'{name.capitalize()}' Passenger Is Updated","Driver Id" : getpas.id})
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
 
@@ -586,7 +586,6 @@ def PassengerProfile(request,pk):
         ls = []
         for i in rat:
             ls.append(int(i.rates))
-        print(ls)
         if ls == []:
             average = 0.0
         else:
@@ -611,11 +610,11 @@ def PassengerProfile(request,pk):
 @api_view(['POST'])
 def SearchForRide(request,dd):
     data = request.data
-    pickup = data["pickUp"]
-    dropout = data["dropout"]
+    pickup = data["pickUp"].casefold()
+    dropout = data["dropout"].casefold()
     date = data["date"]  
     if pickup and dropout:
-        pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp=pickup,dropout=dropout,date=date,trip_status='P',as_user = 'Driver').exclude(status='3')
+        pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp__startswith=pickup,dropout__startswith=dropout,date=date,trip_status='P',as_user = 'Driver').exclude(status='3')
         if len(pp) > 0:
             serial = Filterserializer(pp,many=True)
             return Response({'status':1 ,"msg":"Success", 'data':serial.data})    
@@ -749,34 +748,64 @@ def PassengerAddBooking(request,pk):
         if(not date):
             return Response({'status':0,'msg': 'Date Is Not Added..'})
         
-        addbooking = Ride.objects.create(
+        addbookings = Ride.objects.filter(
             as_user = 'Passenger',
             getpassenger = getpas,
-            capacity = parcel,
-            seats = passenger,
             ride_type = typ,
-            pickUp_latitude = pickUp_lat,
-            pickUp_longitude = pickUp_lan,
-            car_latitude = pickUp_lat,
-            car_longitude = pickUp_lan,
-            dropout_latitude = dropout_lat,
-            dropout_longitude = dropout_lan,
-            pickup_address1 = pickup_address1,
-            pickup_address2 = pickup_address2,
-            dropout_address1 = dropout_address1,
-            dropout_address2 = dropout_address2,
             pickUp = pickUp,
             dropout = dropout,
             date = date,
-            # time = time,
-            create_at = showtime,
-            update_at = showtime
         )
-        return Response({
-                "Booking_Id" : addbooking.id,
-                "status":1,
-                "msg":"Booking Added Successfully"
-                })
+        if len(addbookings) > 0:
+            addbookings[0].capacity = parcel
+            addbookings[0].seats = passenger
+            addbookings[0].pickUp_latitude = pickUp_lat
+            addbookings[0].pickUp_longitude = pickUp_lan
+            addbookings[0].car_latitude = pickUp_lat
+            addbookings[0].car_longitude = pickUp_lan
+            addbookings[0].dropout_latitude = dropout_lat
+            addbookings[0].dropout_longitude = dropout_lan
+            addbookings[0].pickup_address1 = pickup_address1
+            addbookings[0].pickup_address2 = pickup_address2
+            addbookings[0].dropout_address1 = dropout_address1
+            addbookings[0].dropout_address2 = dropout_address2
+            addbookings[0].create_at = showtime
+            addbookings[0].update_at = showtime
+            addbookings.save()
+            return Response({
+                    "Booking_Id" : addbookings[0].id,
+                    "status":1,
+                    "msg":"Booking Added Successfully"
+                    })
+        else:
+            addbooking = Ride.objects.create(
+                as_user = 'Passenger',
+                getpassenger = getpas,
+                capacity = parcel,
+                seats = passenger,
+                ride_type = typ,
+                pickUp_latitude = pickUp_lat,
+                pickUp_longitude = pickUp_lan,
+                car_latitude = pickUp_lat,
+                car_longitude = pickUp_lan,
+                dropout_latitude = dropout_lat,
+                dropout_longitude = dropout_lan,
+                pickup_address1 = pickup_address1,
+                pickup_address2 = pickup_address2,
+                dropout_address1 = dropout_address1,
+                dropout_address2 = dropout_address2,
+                pickUp = pickUp,
+                dropout = dropout,
+                date = date,
+                # time = time,
+                create_at = showtime,
+                update_at = showtime
+            )
+            return Response({
+                    "Booking_Id" : addbooking.id,
+                    "status":1,
+                    "msg":"Booking Added Successfully"
+                    })
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
 
@@ -804,7 +833,7 @@ def BookingPublishedStop(request,pk):
 def PassengerRideList(request,pk):
     try:
         getpas = Passanger.objects.get(id=pk)
-        bb = Ride.objects.filter(getpassenger=pk,publish='1').exclude(status='3')
+        bb = Ride.objects.filter(getpassenger=pk,publish='1').exclude(status='3').order_by('-trip_status')
         lis = []
         for i in bb:
             if i.status == '0' or i.status == '1':
@@ -841,7 +870,7 @@ def PassengerRideList(request,pk):
 @api_view(['GET'])
 def PassengerBookingList(request,pk):
     try:
-        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="C",as_user='Passenger_bid').exclude(status='3')
+        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="C",as_user='Passenger_bid').exclude(status='3').order_by('-pas_status')
         serial = GetRidepinSerializer(bb,many=True)
         return Response({"status": 1,"msg": "success","data": serial.data})
     except ObjectDoesNotExist:
@@ -850,7 +879,7 @@ def PassengerBookingList(request,pk):
 @api_view(['GET'])
 def PassengerBookingListByT(request,pk):
     try:
-        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="T").exclude(status='3')
+        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="T").exclude(status='3').order_by('-pas_status')
         serial = GetRidepinSerializer(bb,many=True)
         return Response({"status": 1,"msg": "success","data": serial.data})
     except ObjectDoesNotExist:

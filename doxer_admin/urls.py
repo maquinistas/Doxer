@@ -11,6 +11,7 @@ urlpatterns = [
     path('all-passengers/',views.All_Passengers,name='allpassenger'),
     path('all-cars/',views.All_Cars,name='allcars'),
     path('all-rides/',views.All_Rides,name='allrides'),
+    path('accepted-cars/',views.Accepted_Cars,name='acceptedcar'),
     
     
     # path('admin-add-form/',views.Add_Driver_Form,name='driverform'),
@@ -23,7 +24,6 @@ urlpatterns = [
     path('edit-editcar/',views.editcar,name='editcar'),
     path('showid-Driver/<str:pk>',views.Id_proofes,name='showid'),
     path('update-price/',views.updateprice,name='updatepriceb'),
-    path('accepted-cars/',views.Accepted_Cars,name='acceptedcar'),
     
     
     path('admin-login/',views.LoginAdmin,name='loginadmins'),

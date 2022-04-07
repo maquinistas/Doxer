@@ -85,11 +85,16 @@ def AllCities(request):
 @api_view(['POST'])
 def SerachCities(request):
     data = request.data
-    name = data['name']
-    city = Cities.objects.filter(name=name)
+    cit = data['name'].casefold()
+    name = cit.capitalize()
+    city = Cities.objects.filter(name__startswith=name)
     if len(city) > 0:
-        getcity = Cities.objects.get(id=city[0].id)
-        return Response({'name' :getcity.name ,'status':1 ,'msg': 'City Founded'})
+        ls = []
+        for i in city:
+            dic = {}
+            dic['city'] = i.name.capitalize()
+            ls.append(dic)
+        return Response({'status':1 ,'msg': 'City Founded','name' : ls})
     else:
         return Response({'status':0 ,"msg":"Record Not Founded"})
 

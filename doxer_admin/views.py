@@ -219,7 +219,7 @@ def Accepted_Cars(request):
         'pages' : pages,
         'pages1' : pages-1,
         't1' : '2',
-        'title': "All Cars Page"
+        'title': "Accepted Cars Page"
         }
         try:
             if request.method == 'POST':
@@ -319,7 +319,7 @@ def All_Cars(request):
 def All_Rides(request):
     if 'id' in request.session:
         # allu = Trip.objects.exclude(status='C').order_by('-id')[:10]
-        allu = Ride_pin.objects.filter(status='1').order_by('-id')
+        allu = Ride_pin.objects.filter(status='1').order_by('-pas_status')
         per_page = rides_per_page
         # Paginator in a view function to paginate a queryset
         # show 4 news per page
@@ -346,7 +346,7 @@ def All_Rides(request):
             page_no = request.POST.get('page_no', None) 
             starting_number= (int(page_no)-1)*per_page
             ending_number= int(page_no)*per_page
-            res = Ride_pin.objects.filter(status='1').order_by('-id')[starting_number:ending_number]
+            res = Ride_pin.objects.filter(status='1').order_by('-pas_status')[starting_number:ending_number]
             results = []
             for i in res:
                 rdie = Ride.objects.get(id=i.getride.id)
@@ -460,6 +460,7 @@ def car_accept(request):
                 getpas.save()
                 
                 allu = Vehicle.objects.filter(status='0').order_by('-id')
+                allw = Vehicle.objects.filter(status='0')
                 pagess = allu.count()
                 per_page = car_per_page
                 # Paginator in a view function to paginate a queryset
@@ -491,9 +492,17 @@ def car_accept(request):
                         results['vehicle_color'] = i.vehicle_color.capitalize()
                         results['status'] = i.status
                         result.append(results)
-                    return JsonResponse({'status':1,"results":result,'page_range':pages})
+                        if ending_number >= allw.count():
+                            b = allw.count()
+                        else:
+                            b = ending_number
+                    return JsonResponse({'status':1,"results":result,'page_range':pages,'a' : starting_number + 1,'b' : b,'t' : allw.count()})
                 else:
-                    return JsonResponse({'status':1,'results' : 'None','page_range':pages})
+                    if allu.count() == 0:
+                        a = 0
+                    else:
+                        a = 1
+                    return JsonResponse({'status':1,'results' : 'None','page_range':pages,'a' : a,'b' : allu.count(),'t' : allu.count()})
             else:
                 return JsonResponse({'status':0})
         else:
@@ -512,6 +521,7 @@ def car_reject(request):
                 getpas.updated = showtime
                 getpas.save()
                 allu = Vehicle.objects.filter(status='0').order_by('-id')
+                allw = Vehicle.objects.filter(status='0')
                 pagess = allu.count()
                 per_page = car_per_page
                 # Paginator in a view function to paginate a queryset
@@ -542,10 +552,17 @@ def car_reject(request):
                         results['vehicle_color'] = i.vehicle_color.capitalize()
                         results['status'] = i.status
                         result.append(results)
-                        
-                    return JsonResponse({'status':1,"results":result,'page_range':pages})
+                        if ending_number >= allw.count():
+                            b = allw.count()
+                        else:
+                            b = ending_number
+                    return JsonResponse({'status':1,"results":result,'page_range':pages,'a' : starting_number + 1,'b' : b,'t' : allw.count()})
                 else:
-                    return JsonResponse({'status':1,'results' : 'None'})
+                    if allu.count() == 0:
+                        a = 0
+                    else:
+                        a = 1
+                    return JsonResponse({'status':1,'results' : 'None','a' : a,'b' : allu.count(),'t' : allu.count()})
                 # return JsonResponse({'status':1})
             else:
                 return JsonResponse({'status':0})
@@ -726,11 +743,9 @@ def map(request):
 def Id_proofes(request,pk):
     if pk == '1':
         id = request.POST.get('id')
-        print(id)
         getid = Driver.objects.get(id=id)
         return JsonResponse({"name":getid.name.capitalize(),"id1":getid.image1.url,"id2":getid.image2.url})
     if pk == '2':
         id = request.POST.get('id')
-        print(id)
         getid = Passanger.objects.get(id=id)
         return JsonResponse({"name":getid.name.capitalize(),"id1":getid.image1.url,"id2":getid.image2.url})

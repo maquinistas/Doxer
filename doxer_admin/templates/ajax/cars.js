@@ -30,9 +30,6 @@ $(".accept-car").on('click',function(){
         method : "POST",
         data : mydata,
         success : function(data){
-            $("#et1").text(data.a);
-            $("#et2").text(data.b);
-            $("#totale").text(data.t);
             if (data.status==1){
                 setTimeout(function() {
                     $('#Accept').modal('hide');
@@ -49,25 +46,28 @@ $(".accept-car").on('click',function(){
                     } else {
                         $('#tests-table').html('');
                         $.each(pass, function(i, val) {
-                        //append to post
-                        for(var j=1 ; j <= i ; j++){j};
-                        if(val.status == '0'){
-                        var status = "<label class='badge badge-danger'>New</label>";
-                        } else if(val.status == '1'){
-                            var status = "<label class='badge badge-success'>Approval</label>";
-                        } else if(val.status == '2'){
-                            var status = "<label class='badge badge-warning'>Rejected</label>";
-                        } else {
-                            var status = '';
+                            //append to post
+                            for(var j=1 ; j <= i ; j++){j};
+                            if(val.status == '0'){
+                                var status = "<label class='badge badge-danger'>New</label>";
+                            } else if(val.status == '1'){
+                                var status = "<label class='badge badge-success'>Approval</label>";
+                            } else if(val.status == '2'){
+                                var status = "<label class='badge badge-warning'>Rejected</label>";
+                            } else {
+                                var status = '';
+                            }
+                            $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
+                                "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
+                                + '</td></tr>')
+                            });
                         }
-                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
-                            "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
-                            + '</td></tr>')
-                        });
-                    }
-                }, 2000);
-            }
-            if (data.status==0){
+                        $("#et1").text(data.a);
+                        $("#et2").text(data.b);
+                        $("#totale").text(data.t);
+                    }, 2000);
+                }
+                if (data.status==0){
                 setTimeout(function() {
                     $('#Accept').modal('hide');
                     $('#accept_car').removeAttr('disabled');
@@ -91,11 +91,6 @@ $(".reject-car").on('click',function(){
         method : "POST",
         data : mydata,
         success : function(data){
-            $("#et1").text(data.a);
-            console.log('data a',data);
-            console.log('data a',data.b);
-            $("#et2").text(data.b);
-            $("#totale").text(data.t);
             if (data.status==1){
                 setTimeout(function() {
                     $('#Reject').modal('hide');
@@ -112,12 +107,12 @@ $(".reject-car").on('click',function(){
                     } else {
                         $('#tests-table').html('');
                         $.each(pass, function(i, val) {
-                        //append to post
-                        for(var j=1 ; j <= i ; j++){j};
-                        if(val.status == '0'){
-                        var status = "<label class='badge badge-danger'>New</label>";
-                        } else if(val.status == '1'){
-                            var status = "<label class='badge badge-success'>Approval</label>";
+                            //append to post
+                            for(var j=1 ; j <= i ; j++){j};
+                            if(val.status == '0'){
+                                var status = "<label class='badge badge-danger'>New</label>";
+                            } else if(val.status == '1'){
+                                var status = "<label class='badge badge-success'>Approval</label>";
                         } else if(val.status == '2'){
                             var status = "<label class='badge badge-warning'>Rejected</label>";
                         } else {
@@ -128,6 +123,9 @@ $(".reject-car").on('click',function(){
                             + '</td></tr>')
                         });
                     }
+                    $("#et1").text(data.a);
+                    $("#et2").text(data.b);
+                    $("#totale").text(data.t);
                 }, 2000);
             }
             if (data.status==0){
