@@ -63,10 +63,10 @@
         $.ajax({
           type: "POST",
           url: "{% url 'doxer_admin:map' %}", 
-          data : {'rid' : rideid,'time' : time, csrfmiddlewaretoken : '{{ csrf_token }}'},
+          data : {'rid' : rideid,'time' : time,"km" : directions.distance, csrfmiddlewaretoken : '{{ csrf_token }}'},
           // handle a successful response
           success: function (data) {
-            console.log('pass',directions.steps);
+            console.log('Distance Between',directions.distance);
           },
           error: function () {
             console.log('fail');

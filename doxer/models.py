@@ -132,6 +132,7 @@ class Ride(models.Model):
     Max_seats = models.BigIntegerField(default=1,blank=True)
     Max_parcel = models.BigIntegerField(default=1,blank=True)
     add_information = models.TextField(blank=True)
+    map_date = models.CharField(blank=True,max_length=255,null=True)
     publish = models.CharField(default=0,max_length=20,choices=[('0','No'),('1','Yes')])
     status = models.CharField(default=0,max_length=20,choices=[('0','Pending'),('1','Ride Full'),('3','Ride Cancel')])
     trip_status = models.CharField(default='P',max_length=20,choices=[('P','Pending'),('O','On The Way'),('E','Complete Trip')])

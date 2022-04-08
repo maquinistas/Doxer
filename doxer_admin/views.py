@@ -318,7 +318,6 @@ def All_Cars(request):
     
 def All_Rides(request):
     if 'id' in request.session:
-        # allu = Trip.objects.exclude(status='C').order_by('-id')[:10]
         allu = Ride_pin.objects.filter(status='1').order_by('-pas_status')
         per_page = rides_per_page
         # Paginator in a view function to paginate a queryset
@@ -685,6 +684,8 @@ def map_view(request):
     else:
         return redirect("doxer_admin:loginpage")
 
+import re
+
 def map(request):
     lat_a = request.GET.get("lat_a")
     long_a = request.GET.get("long_a")
@@ -717,12 +718,22 @@ def map(request):
     if request.method == "POST":
         rideid = request.POST.get("rid")
         timer = request.POST.get("time")
+        km = request.POST.get("km")
         ridesta = Ride.objects.get(id=rideid)
         if ridesta.status == '0' and ridesta.publish == '0':
-            ridesta.dtime = timer
-            ridesta.publish = '1'
-            print("Save And realese")
-            ridesta.save()
+            if ridesta.as_user == "Passenger":
+                ridesta.dtime = timer
+                ridesta.publish = '1'
+                ridesta.save()
+            if ridesta.as_user == "Driver":
+                print(km,"----From Map")
+                km1 = re.sub(",","",km)
+                realkm = float(km1.replace("km",""))
+                print(realkm,"----From Map")
+                ridesta.fees = realkm * ridesta.getdriver.fare_per_km
+                ridesta.map_date = timer
+                ridesta.publish = '1'
+                ridesta.save()
         # rides = Ride.objects.filter(publish='0')
         # for i in rides:
         #     i.delete()

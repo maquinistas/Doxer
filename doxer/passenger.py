@@ -477,25 +477,24 @@ def RequestForRide(request,pid,rid):
         ridegid = Ride.objects.get(id=rid,publish='1')
         data = request.data
         pas = data['passenger']
-        print(pas)
         par = data['parcel']
-        print(par)
         if ridegid.ride_type == "C":
-            if(not par):
-                par = 0
-                pas = pas
-                muls = ridegid.fees * int(pas)
-            if(not pas):
-                pas = 0
-                par = par
-                muls = ridegid.fees * int(par)
-            
             if pas and par:
                 pas = pas
                 par = par
                 pasw = ridegid.fees * int(pas)
                 parw = ridegid.fees * int(par)
                 muls = pasw + parw
+            if(not par):
+                par = 0
+                pas = pas
+                muls = ridegid.fees * int(pas)
+                
+            if(not pas):
+                pas = 0
+                par = par
+                muls = ridegid.fees * int(par)
+            
         
         if ridegid.ride_type == "T":
                 pas = 0
@@ -610,14 +609,39 @@ def PassengerProfile(request,pk):
 @api_view(['POST'])
 def SearchForRide(request,dd):
     data = request.data
-    pickup = data["pickUp"].casefold()
-    dropout = data["dropout"].casefold()
-    date = data["date"]  
+    pickup1 = data["pickUp"].casefold()
+    dropout1 = data["dropout"].casefold()
+    pickup = re.sub(" ","",pickup1)
+    dropout = re.sub(" ","",dropout1)
+    date = data["date"]
+    seat = data["seat"]
     if pickup and dropout:
+        # pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp=pickup,dropout=dropout,date=date,trip_status='P',as_user = 'Driver')
         pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp__startswith=pickup,dropout__startswith=dropout,date=date,trip_status='P',as_user = 'Driver').exclude(status='3')
         if len(pp) > 0:
-            serial = Filterserializer(pp,many=True)
-            return Response({'status':1 ,"msg":"Success", 'data':serial.data})    
+            ls = []
+            for instance in pp:
+                representation = {}
+                representation["ride_id"] = instance.id
+                representation["driver"] = instance.getdriver.name
+                representation["pro_image"] = instance.getdriver.pro_image.url
+                representation["seats"] = instance.seats
+                representation["capacity"] = instance.capacity
+                representation["pickUp"] = instance.pickUp
+                representation["dropout"] = instance.dropout
+                representation["time"] = instance.time
+                representation["dtime"] = instance.dtime
+                representation["map_time"] = instance.map_date
+                representation["date"] = instance.date
+                if instance.ride_type == 'C':
+                    fees = float(instance.fees) * int(seat)
+                    representation["fees"] = f"{fees}"
+                if instance.ride_type == 'T':
+                    representation["fees"] = f"{instance.fees}"
+                representation["add_information"] = instance.add_information
+                ls.append(representation)
+            # serial = Filterserializer(pp,many=True)
+            return Response({'status':1 ,"msg":"Success", 'data':ls})    
         else:
             return Response({'status':0 ,"msg":"No Record Founded"})    
     else:
@@ -644,9 +668,9 @@ def ViewRideDetails(request,pk,pp):
             getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
             sera = RidepinSerializer(getq,many=True)
             if getr.ride_type == 'C':
-                return Response({'status':1, 'msg':"Success","ride_type" : getr.ride_type,"time" : getr.time,"dtime" : getr.dtime,"driver_id": getr.getdriver.id,"driver": getr.getdriver.name,"Profile": getr.getdriver.pro_image.url,"car_name": f"{getr.car.vehical_variant.brand.brand} {getr.car.vehical_variant.cars}","car_color": getr.car.vehicle_color,"pickUp": getr.pickUp,"dropout": getr.dropout,"seats": getr.seats,"capacity": getr.capacity,"date": getr.date,"adda" : getr.status,"fees": f"{getr.fees}","add_information": getr.add_information,'data' : sera.data})
+                return Response({'status':1, 'msg':"Success","ride_type" : getr.ride_type,"time" : getr.time,"dtime" : getr.dtime,"map_time" : getr.map_date,"driver_id": getr.getdriver.id,"driver": getr.getdriver.name,"Profile": getr.getdriver.pro_image.url,"car_name": f"{getr.car.vehical_variant.brand.brand} {getr.car.vehical_variant.cars}","car_color": getr.car.vehicle_color,"pickUp": getr.pickUp,"dropout": getr.dropout,"seats": getr.seats,"capacity": getr.capacity,"date": getr.date,"adda" : getr.status,"fees": f"{getr.fees}","add_information": getr.add_information,'data' : sera.data})
             if getr.ride_type == 'T':
-                return Response({'status':1, 'msg':"Success","ride_type" : getr.ride_type,"time" : getr.time,"dtime" : getr.dtime,"driver_id": getr.getdriver.id,"driver": getr.getdriver.name,"Profile": getr.getdriver.pro_image.url,"pickUp": getr.pickUp,"dropout": getr.dropout,"seats": getr.seats,"capacity": getr.capacity,"date": getr.date,"adda" : getr.status,"fees": f"{getr.fees}","add_information": getr.add_information,'data' : sera.data})
+                return Response({'status':1, 'msg':"Success","ride_type" : getr.ride_type,"time" : getr.time,"dtime" : getr.dtime,"map_time" : getr.map_date,"driver_id": getr.getdriver.id,"driver": getr.getdriver.name,"Profile": getr.getdriver.pro_image.url,"pickUp": getr.pickUp,"dropout": getr.dropout,"seats": getr.seats,"capacity": getr.capacity,"date": getr.date,"adda" : getr.status,"fees": f"{getr.fees}","add_information": getr.add_information,'data' : sera.data})
         else:
             return Response({'status' : 0,'msg':'No Ride'})
         # # getride = Ride.objects.get(id=pk)
@@ -847,6 +871,7 @@ def PassengerRideList(request,pk):
                 representation["date"] = i.date
                 representation["time"] = i.time
                 representation["dtime"] = i.dtime
+                representation["map_time"] = i.map_date
                 representation["ride_status"] = i.status
                 representation["trip_pas_status"] = i.trip_status
                 if i.status == '1':
@@ -892,6 +917,22 @@ def OwnBookingFilterDetails(request,pk,pp):
         getr = Ride.objects.get(id=pk,as_user='Driver',publish='1')
         getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
         getfe = Ride_pin.objects.filter(getride=pk,passengerid=pp).exclude(status='2')
+        print(getfe)
+        ls = []
+        for instance in getq:
+            representations = {}
+            representations['pin_id'] = instance.id
+            representations['ride_type'] = instance.ride_type
+            representations['Passenger_id'] = instance.passengerid.id
+            representations['passenger_name'] = instance.passengerid.name.capitalize()
+            representations['passenger_profile'] = instance.passengerid.pro_image.url
+            representations['for_passenger'] = instance.for_passenger
+            representations['for_parcel'] = instance.for_parcel
+            representations['request_date'] = instance.request_date
+            representations['fees'] = instance.fees
+            representations['Location'] = instance.pickUp.capitalize()
+            representations['Destination'] = instance.dropout.capitalize()
+            ls.append(representations)
         sera = RidepinSerializer(getq,many=True)
         if getr.ride_type == "T":
             return Response({'status':1, 'msg':"Success",
@@ -912,12 +953,13 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "dropout_longitude": getr.dropout_longitude,
                             "time": getr.time,
                             "dtime": getr.dtime,
+                            "map_time": getr.map_date,
                             "trip_status": getr.trip_status,
-                            "capacity": getfe[0].id,
+                            "capacity": getfe[0].for_parcel,
                             "date": getr.date,
                             "fees": f"{getfe[0].fees}",
                             "add_information": getr.add_information.capitalize(),
-                            'data' : sera.data
+                            'data' : ls
                             })
         if getr.ride_type == "C":
             return Response({'status':1, 'msg':"Success",
@@ -938,13 +980,13 @@ def OwnBookingFilterDetails(request,pk,pp):
                             "dropout_longitude": getr.dropout_longitude,
                             "time": getr.time,
                             "dtime": getr.dtime,
+                            "map_time": getr.map_date,
                             "seats": getfe[0].for_passenger,
                             "trip_status": getr.trip_status,
-                            # "capacity": getfe.for_parcel,
                             "date": getr.date,
                             "fees": f"{getfe[0].fees}",
                             "add_information": getr.add_information.capitalize(),
-                            'data' : sera.data
+                            'data' : ls
                             })
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
@@ -1281,16 +1323,24 @@ def ReportDriverBehavior(request,Rid,pk):
         ridepin = Ride_pin.objects.get(getride=Rid,passengerid=pk)
         getpas = Passanger.objects.get(id=pk)
         getdri = Driver.objects.get(id=getride.getdriver.id)    
-        rat = Driver_Report.objects.create(
+        rate = Driver_Report.objects.filter(
             mine = getdri,
             tri = getride,
             passengerid = getpas,
-            report_text = report_text,
-            create = showtime,
         )
-        ridepin.pas_status = "E"
-        ridepin.save()
-        return Response({'status':1,'msg' : 'Report Successfully'})
+        if len(rate) > 0:
+            return Response({'status':0,'msg' : 'Report has been Given'})
+        else:
+            rat = Driver_Report.objects.create(
+                mine = getdri,
+                tri = getride,
+                passengerid = getpas,
+                report_text = report_text,
+                create = showtime,
+            )
+            ridepin.pas_status = "E"
+            ridepin.save()
+            return Response({'status':1,'msg' : 'Report Successfully'})
     except ObjectDoesNotExist:
         return Response({'status':0,'msg' : 'Ride Is Not Found'})
 

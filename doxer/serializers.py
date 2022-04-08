@@ -1,37 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
-
-# class CitySerializer(ModelSerializer):
-#     class Meta:
-#         model = Cities
-#         fields = ['id','name']
-
-# class getPassangerSerializer(ModelSerializer):
-#     class Meta:
-#         model = Passanger
-        
-#     def to_representation(self, instance):
-#         representation = dict()
-#         representation["username"] = instance.name
-#         representation["email"] = instance.email
-#         representation["pro_image"] = instance.pro_image.url
-#         representation["contact_no"] = instance.contact_no
-#         if instance.gender == 'M':
-#             representation["gender"] = 'Male'
-#         elif instance.gender == 'F':
-#             representation["gender"] = 'Female'
-#         elif instance.gender == 'O':
-#             representation["gender"] = 'Other'
-#         else:
-#             representation["gender"] = ''
-#         representation["dob"] = instance.dob
-#         # representation["rating"] = instance.
-#         representation["city"] = instance.city
-#         representation["bio"] = instance.bio
-        
-#         return representation
-        
+       
 class RideSerializer(ModelSerializer):
     class Meta:
         model = Ride
@@ -173,6 +143,7 @@ class DriverBookingpinSerializer(ModelSerializer):
         representation["dropout"] = instance.dropout.capitalize()
         representation["time"] = instance.getride.time
         representation["dtime"] = instance.getride.dtime
+        representation["map_time"] = instance.getride.map_date
         representation["Passenger"] = instance.for_passenger
         representation["Parcel"] = instance.for_parcel
         representation["offer_price"] = f"{instance.offer_price}"
@@ -196,6 +167,7 @@ class Filterserializer(serializers.ModelSerializer):
         representation["dropout"] = instance.dropout
         representation["time"] = instance.time
         representation["dtime"] = instance.dtime
+        representation["map_time"] = instance.map_date
         representation["date"] = instance.date
         representation["fees"] = f"{instance.fees}"
         representation["add_information"] = instance.add_information
@@ -217,6 +189,7 @@ class MultiFilterserializer(serializers.ModelSerializer):
         representation["date"] = instance.date
         representation["time"] = instance.time
         # representation["dtime"] = instance.dtime
+        representation["map_time"] = instance.map_date
         representation["fees"] = f"{instance.fees}"
         representation["add_information"] = instance.add_information
         representation["Animal"] = instance.pet_allowed
@@ -242,6 +215,7 @@ class CarRideFilterserializer(serializers.ModelSerializer):
         representation["date"] = instance.date
         representation["time"] = instance.time
         representation["dtime"] = instance.dtime
+        representation["map_time"] = instance.map_date
         representation["fees"] = instance.fees
         representation["status"] = instance.status
         representation["trip_status"] = instance.trip_status
@@ -263,6 +237,7 @@ class TruckRideFilterserializer(serializers.ModelSerializer):
         representation["pickUp"] = instance.pickUp
         representation["time"] = instance.time
         representation["dtime"] = instance.dtime
+        representation["map_time"] = instance.map_date
         representation["dropout"] = instance.dropout
         representation["date"] = instance.date
         representation["fees"] = instance.fees

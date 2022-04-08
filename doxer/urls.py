@@ -25,7 +25,7 @@ driverurl = [
     path(r"get-my-truck-rides-<str:pk>/",driver.GetMyTruckRide),#done
     path(r"driver-stop-ride-<str:pk>/",driver.RidePublishedStop), 
     # Search For Ride Request By Passenger
-    path(r"search-booking-<str:dd>-by-driver/<str:pk>/",driver.SerchBookingFilter), #done #done
+    path(r"search-booking-<str:dd>-by-driver/",driver.SerchBookingFilter), #done #done
     # path(r"driver-get-booking-details-<str:pk>/",driver.DriverBookingList),
     path(r"driver-send-request-for-booking-<str:did>-<str:bid>/",driver.RequestForBooking),#done
     path(r"driver-get-own-bid-<str:pk>/",driver.GetOwnBookin_PinListing),

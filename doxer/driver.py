@@ -433,6 +433,7 @@ def AddRideForCar(request,pk):
         capacity = data['capacity']
         seats = data['seats']
         km = data['fees']
+        print(km,"---from mobile app")
         ca = data['carid']
         if ca == '0':
             return Response({'status':0,"msg": "Please Add Car"})
@@ -474,8 +475,10 @@ def AddRideForCar(request,pk):
         if(not fees):
             return Response({'status':0,'msg':'KM Is Required'})
 
-        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,publish='1')
+        rideserach = Ride.objects.filter(getdriver = getdriver,pickUp = pick,dropout = drop,date = date,car = cars,publish='1',trip_status="P")
         if len(rideserach) > 0:
+            for i in rideserach:
+                print(i.id)
             return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
         else:
             addrsd = Ride.objects.filter(
@@ -566,6 +569,10 @@ def AddRideForTruck(request,pk):
         date = data['date']
         time = data['time']
         dtime = data['dtime']
+        pickup_address1 = data['pickup_address1']
+        pickup_address2 = data['pickup_address2']
+        dropout_address1 = data['dropout_address1']
+        dropout_address2 = data['dropout_address2']
         capacity = data['capacity']
         fees = data['fees']
         add_information = data['add_information']
@@ -616,6 +623,10 @@ def AddRideForTruck(request,pk):
             fees = fees,
             add_information = add_information,
             publish = '1',
+            pickup_address1 = pickup_address1,
+            pickup_address2 = pickup_address2,
+            dropout_address1 = dropout_address1,
+            dropout_address2 = dropout_address2,
             create_at = showtime,
             update_at = showtime
         )
@@ -818,7 +829,7 @@ def PassengerProfileViewByPassenger(request,pk):
 def RidesBookingFilter(request,pk):
     try:
         getr = Ride.objects.get(id=pk,publish='1')
-        getreq = Ride_pin.objects.filter(getride=getr.id,status="1",)
+        getreq = Ride_pin.objects.filter(getride=getr.id,status="1")
         sr = MineRidepinSerializer(getreq,many=True)
         return Response({'status':1, 'msg':"Success",
                         "id": getr.id,
@@ -899,7 +910,7 @@ def RejectRequestForTripByDriver(request,pk):
 def GetMyCarRide(request,pk):
     try:
         getdri = Driver.objects.get(id=pk)
-        getride = Ride.objects.filter(getdriver=getdri,ride_type='C',publish='1').exclude(status='3').order_by('-trip_status')
+        getride = Ride.objects.filter(getdriver=getdri,ride_type='C',publish='1').exclude(status='3').order_by('-trip_status','date')
         if getride:
             serial = CarRideFilterserializer(getride,many=True)
             return Response({'status':1, 'msg':"Success","data":serial.data}) 
@@ -958,17 +969,17 @@ def DriverAddCar(request,pk,mid):
                 rnum = data['reg_num']
                 color = data['vehicle_color']
                 ad = Vehicle.objects.filter(reg_num=rnum)
-                # if len(ad) > 0:
-                #     return Response({"status":0,"msg":"Car's Register Number Is Used"})
-                # else:
-                addcar = Vehicle.objects.create(
-                    driverid = getdri,
-                    reg_num = rnum,
-                    created = showtime,
-                    vehical_variant = model,
-                    vehicle_color = color
-                )
-                return Response({"status":1,"msg":"Vehicle Add Successfully","Car_id":addcar.id})
+                if len(ad) > 0:
+                    return Response({"status":0,"msg":"Register Number Is Already Used"})
+                else:
+                    addcar = Vehicle.objects.create(
+                        driverid = getdri,
+                        reg_num = rnum,
+                        created = showtime,
+                        vehical_variant = model,
+                        vehicle_color = color
+                    )
+                    return Response({"status":1,"msg":"Vehicle Add Successfully","Car_id":addcar.id})
             else:
                 return Response({"status":0,"msg":"Wrong Car's Id"})
         else:
@@ -977,21 +988,25 @@ def DriverAddCar(request,pk,mid):
         return Response({"status":0,"msg":"Wrong Id"})
 
 @api_view(['POST'])
-def SerchBookingFilter(request,dd,pk):
+def SerchBookingFilter(request,dd):
     data = request.data
-    pick = data['pickUp'].casefold()
-    drop = data['dropout'].casefold()
+    pickup = data['pickUp'].casefold()
+    dropout = data['dropout'].casefold()
+    pick = re.sub(" ","",pickup1)
+    drop = re.sub(" ","",dropout1)
     date = data['date']
+    driverid = data['driverid']
     book = Ride.objects.filter(ride_type=dd,pickUp__startswith=pick,dropout__startswith=drop,date=date,as_user="Passenger",publish='1',trip_status='P')
     if len(book) > 0:
         lis = []
         for i in book:
             res = {}
-            booki = Ride_pin.objects.filter(getride=i.id,getdriver=pk).exclude(status='3')
-            if booki:
-                res['bid_status'] = "Yes"
-            else:
-                res['bid_status'] = "No"
+            if driverid:
+                booki = Ride_pin.objects.filter(getride=i.id,getdriver=driverid).exclude(status='3')
+                if booki:
+                    res['bid_status'] = "Yes"
+                else:
+                    res['bid_status'] = "No"
             res['id'] = i.id
             res['Passanger_Id'] = i.getpassenger.id
             res['Passenger_name'] = i.getpassenger.name.capitalize()
@@ -1065,24 +1080,6 @@ def DriverDrivenRatingList(request,pk):
             return Response({'status':0,'msg':'No Rating List Founded'})
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
-
-# @api_view(['GET'])
-# def DriverBookingList(request,pk):
-#     try:
-#         bb = Booking.objects.get(id=pk,status='0')
-#         return Response({"status": 1,"msg": "success",
-#                         "id" : bb.id,
-#                         "driver_id"  : bb.getpassenger.id,
-#                         "driver_Name"  : bb.getpassenger.name,
-#                         "driver_pro_image"  : bb.getpassenger.pro_image.url,
-#                         "pickUp": bb.pickUp,
-#                         "dropout": bb.dropout,
-#                         "passenger" : bb.passenger,
-#                         "parcel" : bb.parcel,
-#                         "date" : bb.date,
-#                          })
-#     except ObjectDoesNotExist:
-#         return Response({'status':0 ,"msg":"Wrong Id"})
 
 @api_view(['GET'])
 def CarsListing(request,pk):
@@ -1454,7 +1451,7 @@ def ContactUsDriver(request):
     else:
         return Response({'status' : 0 , 'msg' : "Email Is Not Proper"})
     
-@api_view(['PUT'])
+@api_view(['POST','PUT'])
 def CurrentLoc(request,pk):
     try:
         data = request.data
@@ -1534,6 +1531,7 @@ def BidDetalis(request,pk,dd):
                     'time' : ri.time,
                     'dtime' : ri.dtime,
                     'capacity' : ri.capacity,
+                    'Passenger_id' : ri.getpassenger.id,
                     'Passenger_name' : ri.getpassenger.name.capitalize(),
                     'Passenger_image' : ri.getpassenger.pro_image.url,
                     'fees' : f"{di[0].fees}",
@@ -1556,6 +1554,7 @@ def BidDetalis(request,pk,dd):
                     'trip_pas_status' : ri.ride_type,
                     'seat' : ri.seats,
                     'capacity' : ri.capacity,
+                    'Passenger_id' : "",
                     'Passenger_name' : "",
                     'Passenger_image' : "",
                     'fees' : f"{di[0].fees}",
