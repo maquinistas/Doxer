@@ -212,7 +212,7 @@ $('.pagination li.page-item').on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
+                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>"+ val.date +"</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
                             "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
                             + '</td></tr>')
                         });
@@ -265,7 +265,7 @@ $("#next-page").on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
+                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>"+ val.date +"</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
                             "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
                             + '</td></tr>')
                         });
@@ -324,7 +324,7 @@ $("#prev-page").on('click',function(){
                         } else {
                             var status = '';
                         }
-                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
+                        $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>"+ val.date +"</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
                             "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
                             + '</td></tr>')
                         });
@@ -372,7 +372,7 @@ $(document).ready(function(){
                     } else {
                         var status = '';
                     }
-                    $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
+                    $('#tests-table').append("<tr id='"+val.id+"'><td class='123'> # " + val.id  + "</td><td>"+ val.date +"</td><td>" + "<img src=" +val.pro_image + " alt='car_image' /><span class='pl-2'>" + val.driverid + "</span></td><td>"+ val.reg_num +"</td><td>"+ val.vehical_variant +"</td><td>" + val.vehicle_color + "</td><td>"+ status + "</td><td>" +
                         "<button class='btn btn-success btn-rounded btn-sm Accept-ca' data-target='#Accept' data-toggle='modal' data-sid='"+val.id+"'> <i class='icon-check btn-icon-append'></i></button>  <button class='btn btn-danger btn-rounded  btn-sm Reject-ca' data-target='#Reject' data-toggle='modal' data-sid='"+val.id+"'><i class='icon-close btn-icon-append'></i></button>"
                         + '</td></tr>')
                     });

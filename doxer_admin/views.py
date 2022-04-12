@@ -198,6 +198,66 @@ def All_Passengers(request):
     else:
         return redirect("doxer_admin:loginpage")
    
+def Rejected_Cars(request):
+    if 'id' in request.session:
+        allu = Vehicle.objects.filter(status='2').order_by('id')
+        per_page = car_per_page
+        # Paginator in a view function to paginate a queryset
+        # show 4 news per page
+        obj_paginator = Paginator(allu, per_page)
+        # list of objects on first page
+        first_page = obj_paginator.page(1).object_list
+        
+        page_range =  obj_paginator.page_range
+        pages_range = page_range[-1]
+        pages = pages_range
+
+        context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+        'page_range':page_range,
+        'pages' : pages,
+        'pages1' : pages-1,
+        't1' : '2',
+        'title': "Accepted Cars Page"
+        }
+        try:
+            if request.method == 'POST':
+                #getting page number
+                page_no = request.POST.get('page_no', None)
+                starting_number= (int(page_no)-1)*per_page
+                ending_number= int(page_no)*per_page
+                allw = Vehicle.objects.filter(status='2')
+                res = Vehicle.objects.filter(status='2')[starting_number:ending_number]
+                # elif sort == 'a':
+                #     allw = Vehicle.objects.filter(status='1')
+                #     res = Vehicle.objects.filter(status='1')[starting_number:ending_number]
+                # else:
+                #     allw = Vehicle.objects.all()
+                #     res = Vehicle.objects.all()[starting_number:ending_number]
+                results = []
+                for i in res:
+                    resa = {}
+                    resa['id'] = i.id
+                    resa['pro_image'] = i.driverid.pro_image.url
+                    resa['driverid'] = i.driverid.name.capitalize() if i.driverid.name.capitalize() else i.driverid.email_or_num
+                    resa['reg_num'] = i.reg_num.upper()
+                    resa['vehical_variant'] = f'{i.vehical_variant.brand},{i.vehical_variant.cars}'
+                    resa['vehicle_color'] = i.vehicle_color.capitalize()
+                    resa['status'] = i.status
+                    resa['date'] = i.created.strftime("%d-%b-%Y")
+                    results.append(resa)
+                    if ending_number >= allw.count():
+                        b = allw.count()
+                    else:
+                        b = ending_number
+                return JsonResponse({"results":results,'a' : starting_number + 1,'b' : b,'t' : allw.count()})
+        except:
+            return JsonResponse({"results":[''],'a' : 0,'b' : 0,'t' : allu.count()})
+        return render(request,'doxer_admin/rejectecar.html',context)
+    else:
+        return redirect("doxer_admin:loginpage")
+    
 def Accepted_Cars(request):
     if 'id' in request.session:
         allu = Vehicle.objects.filter(status='1').order_by('id')
@@ -245,6 +305,7 @@ def Accepted_Cars(request):
                     resa['vehical_variant'] = f'{i.vehical_variant.brand},{i.vehical_variant.cars}'
                     resa['vehicle_color'] = i.vehicle_color.capitalize()
                     resa['status'] = i.status
+                    resa['date'] = i.created.strftime("%d-%b-%Y")
                     results.append(resa)
                     if ending_number >= allw.count():
                         b = allw.count()
@@ -304,6 +365,7 @@ def All_Cars(request):
                     resa['vehical_variant'] = f'{i.vehical_variant.brand},{i.vehical_variant.cars}'
                     resa['vehicle_color'] = i.vehicle_color.capitalize()
                     resa['status'] = i.status
+                    resa['date'] = i.created.strftime("%d-%b-%Y")
                     results.append(resa)
                     if ending_number >= allw.count():
                         b = allw.count()
@@ -369,7 +431,7 @@ def All_Rides(request):
                     resa['ride_time'] = i.getride.time
                 else:
                     resa['ride_time'] = i.getride.dtime
-                resa['trip_date'] = i.ride_date
+                resa['trip_date'] = i.ride_date.strftime("%d-%b-%Y")
                 resa['Location'] = i.pickUp.capitalize()
                 resa['destination'] = i.dropout.capitalize()
                 if i.getride.ride_type == "C":
@@ -577,11 +639,21 @@ def BlockPassenger(request):
             showtime = strftime("%Y-%m-%d %H:%M:%S", )
             getpas = Passanger.objects.get(pk=id)
             if getpas.status == 'Active':
+                getride = Ride.objects.filter(getpassenger=id,publish='1',trip_status='P')
+                for i in getride:
+                    print(i.id)
+                    i.publish = '2'
+                    i.save()
                 getpas.status = 'Deactive'
                 getpas.update = showtime
                 getpas.save()
                 return JsonResponse({'status':1})
             elif getpas.status == 'Deactive':
+                getride = Ride.objects.filter(getpassenger=id,publish='2',trip_status='P')
+                for i in getride:
+                    print(i.id)
+                    i.publish = '1'
+                    i.save()
                 getpas.status = 'Active'
                 getpas.update = showtime
                 getpas.save()
@@ -600,12 +672,22 @@ def BlockDriver(request):
             showtime = strftime("%Y-%m-%d %H:%M:%S", )
             getpas = Driver.objects.get(pk=id)
             if getpas.status == 'Active':
+                getride = Ride.objects.filter(getdriver=id,publish='1',trip_status='P')
+                for i in getride:
+                    print(i.id)
+                    i.publish = '2'
+                    i.save()
                 getpas.status = 'Deactive'
                 getpas.update = showtime
                 getpas.save()
                 driver_name = getpas.name if getpas.name else getpas.email_or_num
                 return JsonResponse({'status':1,'driver': f"{driver_name} Block Successfully..!"})
             elif getpas.status == 'Deactive':
+                getride = Ride.objects.filter(getdriver=id,publish='2',trip_status='P')
+                for i in getride:
+                    print(i.id)
+                    i.publish = '1'
+                    i.save()
                 getpas.status = 'Active'
                 getpas.update = showtime
                 getpas.save()
@@ -760,3 +842,9 @@ def Id_proofes(request,pk):
         id = request.POST.get('id')
         getid = Passanger.objects.get(id=id)
         return JsonResponse({"name":getid.name.capitalize(),"id1":getid.image1.url,"id2":getid.image2.url})
+
+
+
+
+
+

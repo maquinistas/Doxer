@@ -127,15 +127,16 @@ class Ride(models.Model):
     date = models.DateField(blank=True,null=True)
     time = models.CharField(blank=True,max_length=255,null=True)
     dtime = models.CharField(blank=True,max_length=255,null=True)
-    seats = models.CharField(default=1,max_length=25,blank=True)
+    seats = models.CharField(default=0,max_length=25,blank=True)
     fees = models.FloatField(max_length=6,blank=True,null=True)
-    Max_seats = models.BigIntegerField(default=1,blank=True)
-    Max_parcel = models.BigIntegerField(default=1,blank=True)
+    Max_seats = models.BigIntegerField(default=0,blank=True)
+    Max_parcel = models.BigIntegerField(default=0,blank=True)
     add_information = models.TextField(blank=True)
     map_date = models.CharField(blank=True,max_length=255,null=True)
-    publish = models.CharField(default=0,max_length=20,choices=[('0','No'),('1','Yes')])
+    publish = models.CharField(default=0,max_length=20,choices=[('0','No'),('1','Yes'),('2','BLOCK USER')])
     status = models.CharField(default=0,max_length=20,choices=[('0','Pending'),('1','Ride Full'),('3','Ride Cancel')])
     trip_status = models.CharField(default='P',max_length=20,choices=[('P','Pending'),('O','On The Way'),('E','Complete Trip')])
+    ride_time = models.DateTimeField(blank=True,null=True)
     create_at = models.DateTimeField(blank=True,null=True)
     update_at = models.DateTimeField(blank=True,null=True)
 
@@ -248,6 +249,13 @@ class Drivers_Rating(models.Model):
     review = models.TextField(blank=True)
     create = models.DateField(blank=True,null=True)
 
+class Driver_Report(models.Model):
+    mine = models.ForeignKey(Driver,on_delete=models.CASCADE)
+    tri = models.ForeignKey(Ride,on_delete=models.CASCADE,blank=True,null=True)
+    passengerid = models.ForeignKey(Passanger,on_delete=models.SET_NULL,blank=True,null=True)
+    report_text = models.TextField(blank=True)
+    create = models.DateField(blank=True,null=True)
+
 class Passenger_Rating(models.Model):
     mine = models.ForeignKey(Passanger, on_delete=models.CASCADE)
     tri = models.ForeignKey(Ride_pin,on_delete=models.CASCADE,blank=True,null=True)
@@ -263,12 +271,6 @@ class Passenger_Report(models.Model):
     report_text = models.TextField(blank=True)
     create = models.DateField(blank=True,null=True)
 
-class Driver_Report(models.Model):
-    mine = models.ForeignKey(Driver,on_delete=models.CASCADE)
-    tri = models.ForeignKey(Ride,on_delete=models.CASCADE,blank=True,null=True)
-    passengerid = models.ForeignKey(Passanger,on_delete=models.SET_NULL,blank=True,null=True)
-    report_text = models.TextField(blank=True)
-    create = models.DateField(blank=True,null=True)
 
 class Search_History(models.Model):
     driverid = models.ForeignKey(Driver,on_delete=models.CASCADE,blank=True,null=True)

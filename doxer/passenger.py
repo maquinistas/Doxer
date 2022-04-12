@@ -37,11 +37,11 @@ def Average(l):
     avg = sum(l) / len(l) 
     return avg
 
-#   ____      ____   
-#  |    \    /    \     
-#  |____/   |______|     
-#  |        |      |     
-#  |        |      |  
+#   ____      ____    ______
+#  |    \    /    \  |  
+#  |____/   |______| |______    
+#  |        |      |        |
+#  |        |      |  ______|
 
 
 @api_view(['POST'])
@@ -67,21 +67,24 @@ def SignUpPassanger(request):
             num = Passanger.objects.filter(contact_no=raw)
             if len(num) > 0:
                 getid = Passanger.objects.get(id=num[0].id)
-                if getid.active_ac_with_otp == '0':
-                    if password != cpassword:
-                            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                    else:
-                        getid.password = make_password(password)
-                        getid.cpassword = cpassword
-                        getid.otp = otp
-                        getid.name = name
-                        getid.ntk = nks
-                        getid.create = showtime
-                        getid.update = showtime
-                        getid.save()
-                        return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Mobile",'OTP':getid.otp})
+                if getid.status == 'Deactivate':
+                    return Response({'status' : 0 , 'msg' : "Account Has been Block"})
                 else:
-                    return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Use"})
+                    if getid.active_ac_with_otp == '0':
+                        if password != cpassword:
+                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                        else:
+                            getid.password = make_password(password)
+                            getid.cpassword = cpassword
+                            getid.otp = otp
+                            getid.name = name
+                            getid.ntk = nks
+                            getid.create = showtime
+                            getid.update = showtime
+                            getid.save()
+                            return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Mobile",'OTP':getid.otp})
+                    else:
+                        return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Use"})
             else:
                 mo = raw     
         elif(re.search(email_pattern, raw)):
@@ -89,30 +92,33 @@ def SignUpPassanger(request):
             mail = Passanger.objects.filter(email=raw)
             if len(mail) > 0:
                 getid = Passanger.objects.get(id=mail[0].id)
-                if getid.active_ac_with_otp == '0':
-                    if password != cpassword:
-                            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                    else:
-                        getid.password = make_password(password)
-                        getid.cpassword = cpassword
-                        getid.otp = otp
-                        getid.name = name
-                        getid.ntk = nks
-                        getid.create = showtime
-                        getid.update = showtime
-                        getid.save()
-                        mail_subject = 'Otp Sent With API.'
-                        # message = render_to_string('doxer_admin/mail.html', {
-                        #     'name': getid.name.capitalize(),
-                        #     'otp': getid.otp,
-                        # })
-                        message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
-                        email_from = settings.EMAIL_HOST_USER
-                        to_email = [getid.email,]
-                        send_mail(mail_subject, message, email_from, to_email)
-                        return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Email",'OTP':getid.otp})
+                if getid.status == 'Deactivate':
+                    return Response({'status' : 0 , 'msg' : "Account Has been Block"})
                 else:
-                    return Response({'status' : 0 , 'msg' : "Email Is Alread Use"})
+                    if getid.active_ac_with_otp == '0':
+                        if password != cpassword:
+                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                        else:
+                            getid.password = make_password(password)
+                            getid.cpassword = cpassword
+                            getid.otp = otp
+                            getid.name = name
+                            getid.ntk = nks
+                            getid.create = showtime
+                            getid.update = showtime
+                            getid.save()
+                            mail_subject = 'Otp Sent With API.'
+                            # message = render_to_string('doxer_admin/mail.html', {
+                            #     'name': getid.name.capitalize(),
+                            #     'otp': getid.otp,
+                            # })
+                            message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
+                            email_from = settings.EMAIL_HOST_USER
+                            to_email = [getid.email,]
+                            send_mail(mail_subject, message, email_from, to_email)
+                            return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Email",'OTP':getid.otp})
+                    else:
+                        return Response({'status' : 0 , 'msg' : "Email Is Alread Use"})
             else:
                 em = raw  
         else:
@@ -476,6 +482,12 @@ def RequestForRide(request,pid,rid):
         showtime = strftime("%Y-%m-%d %H:%M:%S", )
         ridegid = Ride.objects.get(id=rid,publish='1')
         data = request.data
+        pickUp = data['pickup']
+        pickUp_latitude = data['pickUp_latitude']
+        pickUp_longitude = data['pickUp_longitude']
+        dropout = data['dropout']
+        dropout_latitude = data['dropout_latitude']
+        dropout_longitude = data['dropout_longitude']
         pas = data['passenger']
         par = data['parcel']
         if ridegid.ride_type == "C":
@@ -505,11 +517,17 @@ def RequestForRide(request,pid,rid):
             pasid = Passanger.objects.get(id=pid)
             driid = ridegid.getdriver
             getdr = Driver.objects.get(id=driid.id)
-            getbo = Ride_pin.objects.filter(getride=ridegid,passengerid=pasid,status='0')
+            getbo = Ride_pin.objects.filter(getride=ridegid,passengerid=pasid,status__range=['0','1'])
             if getbo:
                 return Response({"status": 0, "msg" : f"Already Booked"})
             else:      
                 createReq = Ride_pin.objects.create(
+                    pickUp = pickUp ,
+                    pickUp_latitude = pickUp_latitude ,
+                    pickUp_longitude = pickUp_longitude ,
+                    dropout = dropout ,
+                    dropout_latitude = dropout_latitude ,
+                    dropout_longitude = dropout_longitude ,
                     as_user = 'Passenger_bid',
                     getdriver = getdr,
                     getride = ridegid,
@@ -519,8 +537,6 @@ def RequestForRide(request,pid,rid):
                     for_passenger = pas,
                     fees = muls,
                     car = ridegid.car,
-                    pickUp = ridegid.pickUp,
-                    dropout = ridegid.dropout,
                     for_parcel = par,
                     passengerid = pasid,
                     request_date = showtime,
@@ -611,19 +627,30 @@ def SearchForRide(request,dd):
     data = request.data
     pickup1 = data["pickUp"].casefold()
     dropout1 = data["dropout"].casefold()
-    pickup = re.sub(" ","",pickup1)
-    dropout = re.sub(" ","",dropout1)
+    # pickup = re.sub(" ","",pickup1)
+    # dropout = re.sub(" ","",dropout1)
     date = data["date"]
     seat = data["seat"]
-    if pickup and dropout:
+    if pickup1 and dropout1:
         # pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp=pickup,dropout=dropout,date=date,trip_status='P',as_user = 'Driver')
-        pp = Ride.objects.filter(publish='1',ride_type=dd,pickUp__startswith=pickup,dropout__startswith=dropout,date=date,trip_status='P',as_user = 'Driver').exclude(status='3')
+        pps = Ride.objects.filter(date=date,publish='1',ride_type=dd,trip_status='P',as_user = 'Driver')
+        ls = []
+        for i in pps:
+            va = i.route
+            if pickup1 in va and dropout1 in va:
+                pi = i.id
+                va = va.index(pickup1)
+                print(va)
+                ls.append(pi)
+        print(ls)  
+        pp = Ride.objects.filter(id__in=ls)
         if len(pp) > 0:
             ls = []
             for instance in pp:
                 representation = {}
                 representation["ride_id"] = instance.id
                 representation["driver"] = instance.getdriver.name
+                representation["vehicle_type"] = instance.ride_type
                 representation["pro_image"] = instance.getdriver.pro_image.url
                 representation["seats"] = instance.seats
                 representation["capacity"] = instance.capacity
@@ -895,7 +922,7 @@ def PassengerRideList(request,pk):
 @api_view(['GET'])
 def PassengerBookingList(request,pk):
     try:
-        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="C",as_user='Passenger_bid').exclude(status='3').order_by('-pas_status')
+        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="C",as_user='Passenger_bid',status__range=['0','1']).order_by('-pas_status')
         serial = GetRidepinSerializer(bb,many=True)
         return Response({"status": 1,"msg": "success","data": serial.data})
     except ObjectDoesNotExist:
@@ -904,7 +931,8 @@ def PassengerBookingList(request,pk):
 @api_view(['GET'])
 def PassengerBookingListByT(request,pk):
     try:
-        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="T").exclude(status='3').order_by('-pas_status')
+        bb = Ride_pin.objects.filter(passengerid=pk,ride_type="T",status__range=['0','1']).order_by('-pas_status')
+        print(bb)
         serial = GetRidepinSerializer(bb,many=True)
         return Response({"status": 1,"msg": "success","data": serial.data})
     except ObjectDoesNotExist:
@@ -915,6 +943,16 @@ def OwnBookingFilterDetails(request,pk,pp):
     try:
         pa = Passanger.objects.get(id=pp)
         getr = Ride.objects.get(id=pk,as_user='Driver',publish='1')
+        rid = Drivers_Rating.objects.filter(tri=pk,mine=getr.getdriver,passengerid=pp)
+        if len(rid) > 0:
+            rid = 'Yes'
+        else:
+            rid = 'No'
+        repo = Driver_Report.objects.filter(tri=pk,mine=getr.getdriver,passengerid=pp)
+        if len(repo) > 0:
+            repo = 'Yes'
+        else:
+            repo = 'No'
         getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
         getfe = Ride_pin.objects.filter(getride=pk,passengerid=pp).exclude(status='2')
         print(getfe)
@@ -938,6 +976,8 @@ def OwnBookingFilterDetails(request,pk,pp):
             return Response({'status':1, 'msg':"Success",
                             "ride_type": getr.ride_type,
                             "RID": getr.id,
+                            "rate": rid,
+                            "report": repo,
                             "driver_id" : getr.getdriver.id,
                             "driver": getr.getdriver.name.capitalize(),
                             "Profile": getr.getdriver.pro_image.url,
@@ -965,6 +1005,8 @@ def OwnBookingFilterDetails(request,pk,pp):
             return Response({'status':1, 'msg':"Success",
                             "ride_type": getr.ride_type,
                             "RID": getr.id,
+                            "rate": rid,
+                            "report": repo,
                             "driver_id" : getr.getdriver.id,
                             "driver": getr.getdriver.name.capitalize(),
                             "Profile": getr.getdriver.pro_image.url,
@@ -1320,7 +1362,7 @@ def ReportDriverBehavior(request,Rid,pk):
         data = request.data
         report_text = data["report_text"]
         getride = Ride.objects.get(id=Rid,publish='1')
-        ridepin = Ride_pin.objects.get(getride=Rid,passengerid=pk)
+        ridepin = Ride_pin.objects.get(getride=Rid,passengerid=pk,status__range=['0','1'])
         getpas = Passanger.objects.get(id=pk)
         getdri = Driver.objects.get(id=getride.getdriver.id)    
         rate = Driver_Report.objects.filter(
@@ -1463,12 +1505,16 @@ def BidDetalis(request,pk):
     try:
         ri = Ride.objects.get(id=pk,publish='1')
         if ri.as_user == 'Passenger':
+            # rate = "No"
+            # repo = "No"
             di = Ride_pin.objects.filter(getride=ri.id,status='1',as_user='Driver_bid')
             if len(di)>0:
                 context = {
                     'status':1,
                     'msg':'success',
                     'id':ri.id,
+                    # 'rate':rate,
+                    # 'report':repo,
                     'pickup' : ri.pickUp.capitalize(),
                     'pickup_address1' : ri.pickup_address1.capitalize(),
                     'pickup_address2' : ri.pickup_address2.capitalize(),
@@ -1481,6 +1527,7 @@ def BidDetalis(request,pk):
                     'dtime' : ri.dtime,
                     'seat' : ri.seats,
                     'capacity' : ri.capacity,
+                    'Driver_id' : di[0].getdriver.id,
                     'Driver_name' : di[0].getdriver.name.capitalize(),
                     'Driver_image' : di[0].getdriver.pro_image.url,
                     'fees' : f"{di[0].fees}",
@@ -1503,6 +1550,7 @@ def BidDetalis(request,pk):
                     'time' : ri.time,
                     'dtime' : ri.dtime,
                     'capacity' : ri.capacity,
+                    'Driver_id' : '',
                     'Driver_name' : '',
                     'Driver_image' : '',
                     'fees' : '',

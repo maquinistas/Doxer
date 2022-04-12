@@ -1,5 +1,3 @@
-
-
 $('tbody').on('click','.check-blocks',function(){
     var id = $(this).attr('data-sid');
     mydata = {pid:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}
@@ -12,18 +10,12 @@ $('tbody').on('click','.check-blocks',function(){
             if (data.status==1){
                 $('#'+id).html('');
                 // $('#errormsg').append("<div class='alert alert-danger' id='pass"+id+"'>"+ data.driver +"</div>")
-                $('#'+id).append("<input type='checkbox' class='check-blocks' data-sid='"+ id +"' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>");
-                setTimeout(function(){
-                    $("#errormsg div#pass"+id).remove();
-                },1500);
+                $('#'+id).append("<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+id+"'><label class='onoffswitch-label' for='myonoffswitch"+id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>");
             }
             if (data.status==2){
                 $('#'+id).html('');
                 // $('#errormsg').append("<div class='alert alert-success' id='pass"+id+"'>"+ data.driver +"</div>")
-                $('#'+id).append("<input type='checkbox' class='check-blocks' data-sid='" +id+ "'>&nbsp;<label class='badge badge-success'>Active</label>"); 
-                setTimeout(function(){
-                    $("#errormsg div#pass"+id).remove();
-                },1500);
+                $('#'+id).append("<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>"); 
             }
             if (data.status==0){
                 // console.log("Unable To Delete User")
@@ -165,9 +157,10 @@ $('.pagination li.page-item').on('click',function(){
                         for(var j=1 ; j <= i ; j++){j};
                         
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -230,9 +223,10 @@ $("#next-page").on('click',function(){
                         buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -289,9 +283,10 @@ $("#prev-page").on('click',function(){
                         for(var j=1 ; j <= i ; j++){j};
 
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -338,13 +333,13 @@ $(document).ready(function(){
                         for(var j=1 ; j <= i ; j++){j};
 
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-blocks onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
-
                         buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
                         $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='ProfileImage'/><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td>"+ val.city + "</td><th id='pr"+val.id+"'>₹ "+ val.fare_per_km + "</th><td id='"+val.id+"'>"+ status + "</td><td>"+ val.id_proofe +"</td><td>" + buttons + '</td></tr>')

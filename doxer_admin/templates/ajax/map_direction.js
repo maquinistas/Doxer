@@ -14,7 +14,7 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
         }
         if (status == 'O'){
             var map = new google.maps.Map(document.getElementById('map-route'), {
-                zoom: 2.5,
+                zoom: 1.5,
                 center: { lat: lat_a, lng: long_a },
                 // mapTypeId: "hybrid",
             });
@@ -100,8 +100,6 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
                 window.location.assign("/doxer-admin/all-rides")
             }
         });
-    }else if(status == 'E'){
-        console.log('endtrip');
     } else {
         directionsService.route({
             origin: origin,

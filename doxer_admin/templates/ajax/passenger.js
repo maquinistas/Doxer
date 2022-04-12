@@ -11,11 +11,11 @@ $('tbody').on('click','.check-block',function(){
         success : function(data){
             if (data.status==1){
                 $('#'+id).html('');
-                $('#'+id).append("<input type='checkbox' class='check-block' data-sid='"+ id +"' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>");
+                $('#'+id).append("<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+id+"'><label class='onoffswitch-label' for='myonoffswitch"+id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>");
             }
             if (data.status==2){
                 $('#'+id).html('');
-                $('#'+id).append("<input type='checkbox' class='check-block' data-sid='" +id+ "'>&nbsp;<label class='badge badge-success'>Active</label>"); 
+                $('#'+id).append("<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>");
             }
             if (data.status==0){
                 // console.log("Unable To Block")
@@ -87,9 +87,10 @@ $('.pagination li.page-item').on('click',function(){
                         for(var j=1 ; j <= i ; j++){j};
 
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -135,9 +136,10 @@ $("#next-page").on('click',function(){
                         //append to post
                         for(var j=1 ; j <= i ; j++){j};
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -189,9 +191,10 @@ $("#prev-page").on('click',function(){
                         //append to post
                         for(var j=1 ; j <= i ; j++){j};
                         if(val.status == 'Active'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else if(val.status == 'Deactive'){
-                            var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                            var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                         } else {
                             var status = '';
                         }
@@ -233,9 +236,10 @@ $(document).ready(function(){
                     //append to post
                     for(var j=1 ; j <= i ; j++){j};
                     if(val.status == 'Active'){
-                        var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                        //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
+                        var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"' checked><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                     } else if(val.status == 'Deactive'){
-                        var status = "<input type='checkbox' class='check-block' data-sid='" +val.id+ "' checked>&nbsp;<label class='badge badge-warning'>Blocked</label>";
+                        var status = "<div class='onoffswitch'><input type='checkbox' name='onoffswitch' data-sid='" +val.id+ "' class='check-block onoffswitch-checkbox' id='myonoffswitch"+val.id+"'><label class='onoffswitch-label' for='myonoffswitch"+val.id+"'><div class='onoffswitch-inner'></div><div class='onoffswitch-switch'></div></label></div>";
                     } else {
                         var status = '';
                     }

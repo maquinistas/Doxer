@@ -10,12 +10,21 @@ from django.core.mail import send_mail
 from django.contrib.auth.hashers  import make_password,check_password
 from time import gmtime, strftime
 from sms import send_sms
-
+from datetime import datetime, timedelta   
 import datetime
+
 date = datetime.date.today()
 start_week = date - datetime.timedelta(days=11)
 end_week = start_week + datetime.timedelta(6)
 
+
+# Function to convert string to datetime
+def convert(date_time):
+    format = '%I:%M%p' # The format
+    datetime_str = datetime.datetime.strptime(date_time, format)
+    realtime = datetime_str.strftime('%H:%M')
+    return realtime 
+# Driver code
 # Create your views here.
 
 email_pattern = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
@@ -43,7 +52,10 @@ def genrateOtp():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from django.utils import timezone
-
+ls = strftime("%M")
+print(ls)
+print(ls[0:2])
+# print(ls[3:6],'-------',strftime("%H:%M"))
 @api_view(['POST'])
 def SignUpDriver(request):
     if request.method  == "POST":
@@ -73,28 +85,31 @@ def SignUpDriver(request):
             num = Driver.objects.filter(contact_no=raw)
             if len(num) > 0:
                 getid = Driver.objects.get(id=num[0].id)
-                if getid.active_ac_with_otp == "0":
-                    if password != cpassword:
-                            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                    else:
-                        getid.password = make_password(password)
-                        getid.cpassword = cpassword
-                        getid.otp = otp
-                        getid.name = name
-                        getid.fare_per_km = per_km_price
-                        getid.status = 'Active'
-                        getid.create_at = showtime
-                        getid.update_at = showtime
-                        getid.ntk = nks
-                        getid.save()
-                        # send_sms(
-                        #         f'Hii {getid.name} \n Your Verification Code Is Here \n {getid.otp} ',
-                        #         '+91634545811120',
-                        #         [getid.contact_no,]
-                        # )
-                        return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':"Mobile",'OTP':getid.otp})
+                if getid.status == 'Deactivate':
+                    return Response({'status' : 0 , 'msg' : "This Account has been Block"})
                 else:
-                    return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Used"})  
+                    if getid.active_ac_with_otp == "0":
+                        if password != cpassword:
+                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                        else:
+                            getid.password = make_password(password)
+                            getid.cpassword = cpassword
+                            getid.otp = otp
+                            getid.name = name
+                            getid.fare_per_km = per_km_price
+                            getid.status = 'Active'
+                            getid.create_at = showtime
+                            getid.update_at = showtime
+                            getid.ntk = nks
+                            getid.save()
+                            # send_sms(
+                            #         f'Hii {getid.name} \n Your Verification Code Is Here \n {getid.otp} ',
+                            #         '+91634545811120',
+                            #         [getid.contact_no,]
+                            # )
+                            return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':"Mobile",'OTP':getid.otp})
+                    else:
+                        return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Used"})  
             else:
                 mo = raw     
         elif(re.search(email_pattern, raw)):
@@ -102,29 +117,31 @@ def SignUpDriver(request):
             mail = Driver.objects.filter(email=raw)
             if len(mail) > 0:
                 getid = Driver.objects.get(id=mail[0].id)
-                if getid.active_ac_with_otp == "0":
-                    if password != cpassword:
-                            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                    else:
-                        getid.password = make_password(password)
-                        getid.cpassword = cpassword
-                        getid.otp = otp
-                        getid.name = name
-                        getid.fare_per_km = per_km_price
-                        getid.create_at = showtime
-                        getid.update_at = showtime
-                        getid.status = 'Active'
-                        getid.ntk = nks
-                        getid.save()
-                        mail_subject = 'Sign Up With Otp.'
-                        message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
-                        email_from = settings.EMAIL_HOST_USER
-                        to_email = [getid.email,]
-                        send_mail(mail_subject, message, email_from, to_email)
-                        return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':'Email','OTP':getid.otp})
+                if getid.status == 'Deactivate':
+                    return Response({'status' : 0 , 'msg' : "This Account has been Block"})
                 else:
-                    return Response({'status' : 0 , 'msg' : "Email Is Alread Used"})
-
+                    if getid.active_ac_with_otp == "0":
+                        if password != cpassword:
+                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                        else:
+                            getid.password = make_password(password)
+                            getid.cpassword = cpassword
+                            getid.otp = otp
+                            getid.name = name
+                            getid.fare_per_km = per_km_price
+                            getid.create_at = showtime
+                            getid.update_at = showtime
+                            getid.status = 'Active'
+                            getid.ntk = nks
+                            getid.save()
+                            mail_subject = 'Sign Up With Otp.'
+                            message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
+                            email_from = settings.EMAIL_HOST_USER
+                            to_email = [getid.email,]
+                            send_mail(mail_subject, message, email_from, to_email)
+                            return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':'Email','OTP':getid.otp})
+                    else:
+                        return Response({'status' : 0 , 'msg' : "Email Is Alread Used"})
             else:
                 em = raw
         else:
@@ -428,12 +445,27 @@ def AddRideForCar(request,pk):
         dropout_latitude = data['dropout_latitude']
         dropout_longitude = data['dropout_longitude']
         date = data['date']
-        time = data['time']
-        dtime = data['dtime']
+        ls = data['route'].casefold()
+        time = data['time'].upper()
+        dtime = data['dtime'].upper()
         capacity = data['capacity']
         seats = data['seats']
         km = data['fees']
-        print(km,"---from mobile app")
+        
+        route = []
+        st = ""
+        for i in ls:
+            if i == '[':
+                route.append(pick)
+            else:
+                st = st + f"{i.replace(',','').replace(']','')}"
+                if i == ',':
+                    route.append(st)
+                    st = ''
+                if i == ']':
+                    route.append(st)
+                    route.append(drop)
+                    
         ca = data['carid']
         if ca == '0':
             return Response({'status':0,"msg": "Please Add Car"})
@@ -444,13 +476,7 @@ def AddRideForCar(request,pk):
         dropout_address1 = data['dropout_address1']
         dropout_address2 = data['dropout_address2']
         getdriver = Driver.objects.get(id=pk)
-        getdriver.fare_per_km = per_price
-        getdriver.save()
         
-        fees = round(float(km)) * int(per_price)
-        
-        cars = Vehicle.objects.get(id=ca)
-        getname = getdriver.name if getdriver.name else getdriver.email_or_num
 
         if(not pickUp_latitude):
             return Response({'status':0,"msg":"pickUp_latitude is Not Add"})
@@ -472,86 +498,101 @@ def AddRideForCar(request,pk):
             return Response({'status':0,'msg':'Pick Up Time is Not Add'})
         if(not dtime):
             return Response({'status':0,'msg':'Drop off Time is Not Add'})
-        if(not fees):
+        if(not per_price):
             return Response({'status':0,'msg':'KM Is Required'})
+        
+        fees = round(float(km)) * int(per_price)
 
+        getdriver.fare_per_km = per_price
+        getdriver.save()
+        
+        cars = Vehicle.objects.get(id=ca)
+        getname = getdriver.name if getdriver.name else getdriver.email_or_num
+        tims = re.sub(" ","",time)
+        
+        ride_time = f"{str(date)} {str(convert(tims))}"
         rideserach = Ride.objects.filter(getdriver = getdriver,pickUp = pick,dropout = drop,date = date,car = cars,publish='1',trip_status="P")
-        if len(rideserach) > 0:
-            for i in rideserach:
-                print(i.id)
-            return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
+        
+        # if len(rideserach) > 0:
+        #     for i in rideserach:
+        #         print(i.id)
+        #     return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
+        # else:
+        addrsd = Ride.objects.filter(
+            as_user = 'Driver',
+            getdriver = getdriver,
+            pickUp = pick,
+            dropout = drop,
+            date = date,
+            car = cars,
+            ride_type = "C",
+            publish = "0"
+        )
+        if len(addrsd) > 0:
+            addrsd[0].pickUp_latitude = pickUp_latitude
+            addrsd[0].pickUp_longitude = pickUp_longitude
+            addrsd[0].car_latitude = pickUp_latitude
+            addrsd[0].car_longitude = pickUp_longitude
+            addrsd[0].dropout_latitude = dropout_latitude
+            addrsd[0].dropout_longitude = dropout_longitude
+            addrsd[0].capacity = capacity
+            addrsd[0].seats = seats
+            addrsd[0].Max_seats = seats
+            addrsd[0].fees = fees
+            addrsd[0].route = route
+            addrsd[0].pickup_address1 = pickup_address1
+            addrsd[0].pickup_address2 = pickup_address2
+            addrsd[0].dropout_address1 = dropout_address1
+            addrsd[0].dropout_address2 = dropout_address2
+            addrsd[0].add_information = add_information
+            addrsd[0].ride_time = ride_time
+            addrsd[0].create_at = showtime
+            addrsd[0].update_at = showtime
+            addrsd[0].save()
+            return Response({
+                "Ride_Id" : addrsd[0].id,
+                "status":1,
+                "msg":"Ride Added Successfully"
+                })
         else:
-            addrsd = Ride.objects.filter(
+            addrid = Ride.objects.create(
                 as_user = 'Driver',
                 getdriver = getdriver,
+                pickUp_latitude = pickUp_latitude,
+                pickUp_longitude = pickUp_longitude,
+                car_latitude = pickUp_latitude,
+                car_longitude = pickUp_longitude,
+                dropout_latitude = dropout_latitude,
+                dropout_longitude = dropout_longitude,
                 pickUp = pick,
                 dropout = drop,
                 date = date,
                 car = cars,
+                route = route,
+                time = time,
+                dtime = dtime,
                 ride_type = "C",
-                publish = "0"
+                capacity = capacity,
+                seats = seats,
+                Max_seats = seats,
+                fees = fees,
+                pickup_address1 = pickup_address1,
+                pickup_address2 = pickup_address2,
+                dropout_address1 = dropout_address1,
+                dropout_address2 = dropout_address2,
+                # pet_allowed = pet,
+                # max_seat_in_back = seatinback,
+                # smoke_allowed = smoke,
+                ride_time = ride_time,
+                add_information = add_information,
+                create_at = showtime,
+                update_at = showtime
             )
-            if len(addrsd) > 0:
-                addrsd[0].pickUp_latitude = pickUp_latitude
-                addrsd[0].pickUp_longitude = pickUp_longitude
-                addrsd[0].car_latitude = pickUp_latitude
-                addrsd[0].car_longitude = pickUp_longitude
-                addrsd[0].dropout_latitude = dropout_latitude
-                addrsd[0].dropout_longitude = dropout_longitude
-                addrsd[0].capacity = capacity
-                addrsd[0].seats = seats
-                addrsd[0].Max_seats = seats
-                addrsd[0].fees = fees
-                addrsd[0].pickup_address1 = pickup_address1
-                addrsd[0].pickup_address2 = pickup_address2
-                addrsd[0].dropout_address1 = dropout_address1
-                addrsd[0].dropout_address2 = dropout_address2
-                addrsd[0].add_information = add_information
-                addrsd[0].create_at = showtime
-                addrsd[0].update_at = showtime
-                addrsd[0].save()
-                return Response({
-                    "Ride_Id" : addrsd[0].id,
-                    "status":1,
-                    "msg":"Ride Added Successfully"
-                    })
-            else:
-                addrid = Ride.objects.create(
-                    as_user = 'Driver',
-                    getdriver = getdriver,
-                    pickUp_latitude = pickUp_latitude,
-                    pickUp_longitude = pickUp_longitude,
-                    car_latitude = pickUp_latitude,
-                    car_longitude = pickUp_longitude,
-                    dropout_latitude = dropout_latitude,
-                    dropout_longitude = dropout_longitude,
-                    pickUp = pick,
-                    dropout = drop,
-                    date = date,
-                    car = cars,
-                    time = time,
-                    dtime = dtime,
-                    ride_type = "C",
-                    capacity = capacity,
-                    seats = seats,
-                    Max_seats = seats,
-                    fees = fees,
-                    pickup_address1 = pickup_address1,
-                    pickup_address2 = pickup_address2,
-                    dropout_address1 = dropout_address1,
-                    dropout_address2 = dropout_address2,
-                    # pet_allowed = pet,
-                    # max_seat_in_back = seatinback,
-                    # smoke_allowed = smoke,
-                    add_information = add_information,
-                    create_at = showtime,
-                    update_at = showtime
-                )
-                return Response({
-                    "Ride_Id" : addrid.id,
-                    "status":1,
-                    "msg":"Ride Added Successfully"
-                    })
+            return Response({
+                "Ride_Id" : addrid.id,
+                "status":1,
+                "msg":"Ride Added Successfully"
+                })
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong Or Data Missing"})
 
@@ -567,16 +608,30 @@ def AddRideForTruck(request,pk):
         dropout_latitude = data['dropout_latitude']
         dropout_longitude = data['dropout_longitude']
         date = data['date']
-        time = data['time']
-        dtime = data['dtime']
+        time = data['time'].upper()
+        dtime = data['dtime'].upper()
         pickup_address1 = data['pickup_address1']
         pickup_address2 = data['pickup_address2']
         dropout_address1 = data['dropout_address1']
         dropout_address2 = data['dropout_address2']
         capacity = data['capacity']
         fees = data['fees']
+        ls = data['route']
         add_information = data['add_information']
-
+        
+        route = []
+        st = ""
+        for i in ls:
+            if i == '[':
+                route.append(pick)
+            else:
+                st = st + f"{i.replace(',','').replace(']','')}"
+                if i == ',':
+                    route.append(st)
+                    st = ''
+                if i == ']':
+                    route.append(st)
+                    route.append(drop)  
         getdriver = Driver.objects.get(id=pk)
         
         if(not pickUp_latitude):
@@ -603,6 +658,8 @@ def AddRideForTruck(request,pk):
             return Response({'status':0,'msg':'Parcel Capacity is Not Add'})
         if(not fees):
             return Response({'status':0,'msg':'Fees is Not Add'})
+        tims = re.sub(" ","",time)
+        ride_time = f"{str(date)} {str(convert(tims))}"
         addrid = Ride.objects.create(
             as_user = 'Driver',
             getdriver = getdriver,
@@ -619,6 +676,7 @@ def AddRideForTruck(request,pk):
             dtime = dtime,
             ride_type = "T",
             seats = '0',
+            route = route,
             capacity = capacity,
             fees = fees,
             add_information = add_information,
@@ -627,6 +685,7 @@ def AddRideForTruck(request,pk):
             pickup_address2 = pickup_address2,
             dropout_address1 = dropout_address1,
             dropout_address2 = dropout_address2,
+            ride_time = ride_time,
             create_at = showtime,
             update_at = showtime
         )
@@ -830,7 +889,37 @@ def RidesBookingFilter(request,pk):
     try:
         getr = Ride.objects.get(id=pk,publish='1')
         getreq = Ride_pin.objects.filter(getride=getr.id,status="1")
-        sr = MineRidepinSerializer(getreq,many=True)
+        sr = []
+        for instance in getreq:
+            ratw = Passenger_Rating.objects.filter(tri=instance.id,mine=instance.passengerid.id,driverid=instance.getdriver.id)
+            repo = Passenger_Report.objects.filter(tri=instance.id,mine=instance.passengerid.id,driverid=instance.getdriver.id)
+            representations = {}
+            representations['bid'] = instance.id
+            if len(ratw) > 0:
+                representations['rat'] = "Yes"
+            else:
+                representations['rat'] = "No"
+            if len(repo) > 0:
+                representations['report'] = "Yes"
+            else:
+                representations['report'] = "No"
+            representations['Passenger_id'] = instance.passengerid.id
+            representations['passenger_name'] = instance.passengerid.name
+            representations['passenger_profile'] = instance.passengerid.pro_image.url
+            representations['for_passenger'] = instance.for_passenger
+            representations['for_parcel'] = instance.for_parcel
+            representations['Trip_status'] = instance.pas_status
+            representations["Driver_Token"] = instance.getdriver.ntk
+            representations["Passenger_Token"] = instance.passengerid.ntk
+            representations['Location'] = instance.pickUp
+            representations['fees'] = f"{instance.fees}"
+            representations['Location_latitude'] = instance.pickUp_latitude
+            representations['Location_longitude'] = instance.pickUp_longitude
+            representations['Destination'] = instance.dropout
+            representations['Destination_latitude'] = instance.dropout_latitude
+            representations['Destination_longitude'] = instance.dropout_longitude
+            representations['request_date'] = instance.request_date
+            sr.append(representations)
         return Response({'status':1, 'msg':"Success",
                         "id": getr.id,
                         "driver": getr.getdriver.name,
@@ -855,7 +944,7 @@ def RidesBookingFilter(request,pk):
                         "date": getr.date,
                         "fees": f"{getr.fees}",
                         "add_information": getr.add_information,
-                        "data":sr.data})      
+                        "data":sr})      
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"})
 
@@ -910,7 +999,7 @@ def RejectRequestForTripByDriver(request,pk):
 def GetMyCarRide(request,pk):
     try:
         getdri = Driver.objects.get(id=pk)
-        getride = Ride.objects.filter(getdriver=getdri,ride_type='C',publish='1').exclude(status='3').order_by('-trip_status','date')
+        getride = Ride.objects.filter(getdriver=getdri,ride_type='C',publish='1').exclude(status='2').order_by('-trip_status','date')
         if getride:
             serial = CarRideFilterserializer(getride,many=True)
             return Response({'status':1, 'msg':"Success","data":serial.data}) 
@@ -992,8 +1081,8 @@ def SerchBookingFilter(request,dd):
     data = request.data
     pickup = data['pickUp'].casefold()
     dropout = data['dropout'].casefold()
-    pick = re.sub(" ","",pickup1)
-    drop = re.sub(" ","",dropout1)
+    pick = re.sub(" ","",pickup)
+    drop = re.sub(" ","",dropout)
     date = data['date']
     driverid = data['driverid']
     book = Ride.objects.filter(ride_type=dd,pickUp__startswith=pick,dropout__startswith=drop,date=date,as_user="Passenger",publish='1',trip_status='P')
@@ -1090,7 +1179,6 @@ def CarsListing(request,pk):
     except ObjectDoesNotExist:
         return Response({'status':0 ,"msg":"Wrong Id"})
 
-# @api_view(['POST']) 
 @api_view(['POST'])
 def AcceptRequestForTripByDriver(request,pk):
     try:
@@ -1243,7 +1331,7 @@ def ReportPassengerBehavior(request,Rid):
                 report_text = report_text,
                 create = showtime,  
             )
-            # getride.pas_status = 'E'
+            getride.pas_status = 'E'
             getride.save()
             return Response({'status':1,'msg' : 'Report Add Successfully'})
     except ObjectDoesNotExist:
@@ -1315,41 +1403,50 @@ def tripsetting(request,pk):
         yesterday = date - datetime.timedelta(days=1)
         tomorrow = date + datetime.timedelta(days=1)
         showtime1 = strftime("%Y-%m-%d", )
+        hour = strftime("%H")
         ride = Ride.objects.get(id=pk,publish='1')
-        if str(ride.date) == str(showtime1):
-            rr = Ride_pin.objects.filter(getride=ride.id)
-            show = TripcountSerial(rr,many=True)
-            # if str(ride.date) == showtime1:
-            if ride.trip_status == 'P':
-                ride.trip_status = 'O'
-                ride.save()
-                return Response({'status':1 ,"msg": f"Trip Started"})
-            
-            if ride.trip_status == 'O':
-                for i in rr:
-                    i.pas_status = "E"
-                    i.today = showtime1
-                    i.save()
-                ride.trip_status = 'E'
-                ride.save()
-                return Response({'status':1 ,"msg": f"Trip Complete"})
-            
-            if ride.trip_status == 'E':
-                return Response({'status':1 ,"msg": f"Trip Complete"})
-        else:
-            ride = Ride.objects.get(id=pk,publish='1')
-            value = True
-            i = 0
-            while (value):
-                yesterday = date - datetime.timedelta(days=i)
-                tomorrow = date + datetime.timedelta(days=i)
-                i = i + 1
-                if str(ride.date) == str(yesterday):
-                    value = False
-                    return Response({'status':0 ,"msg": f"This Ride Date Has A Previous Date {ride.date} which is Gone before {i} days Ago", "ride_date" : ride.date,"days" : i})
-                if str(ride.date) == str(tomorrow):
-                    return Response({'status':0 ,"msg": f"Ride couldn't be able to start as it is on {ride.date} Please Come Again After {i} days", "ride_date" : ride.date,"days" : i})
-                    value = False      
+        rr = Ride_pin.objects.filter(getride=ride.id)
+        hh = ride.ride_time.strftime("%H")
+        mm = ride.ride_time.strftime("%I:%M %p")
+        if ride.trip_status == 'P':
+            if str(ride.date) == str(showtime1):
+                if int(hh) <= int(hour):
+                    # return Response({'status':0 ,"msg": f'Ride start Beacuse Now {hour}:{mins}',"ride_date" : f"{hour}:{mins}"})
+                # show = TripcountSerial(rr,many=True)
+                # if str(ride.ride_time) == showtime1:
+                # if ride.trip_status == 'P':
+                    ride.trip_status = 'O'
+                    ride.save()
+                    return Response({'status':1 ,"msg": f"Trip Started"})
+                else:
+                    return Response({'status':0 ,"msg": f"Ride Can't start Beacuse Ride Time is {mm}","ride_date" : f"{mm}"})
+            else:
+                ride = Ride.objects.get(id=pk,publish='1')
+                value = True
+                i = 0
+                while (value):
+                    
+                    yesterday = date - datetime.timedelta(days=i)
+                    tomorrow = date + datetime.timedelta(days=i)
+                    i = i + 1
+                    if str(ride.date) == str(yesterday):
+                        value = False
+                        return Response({'status':0 ,"msg": f"This Ride Date Has A Previous Date {ride.date} which is Gone before {i} days Ago", "ride_date" : ride.date,"days" : i})
+                    if str(ride.date) == str(tomorrow):
+                        return Response({'status':0 ,"msg": f"Ride couldn't be able to start as it is on {ride.date} Please Come Again After {i} days", "ride_date" : ride.date,"days" : i})
+                        value = False
+                        
+        if ride.trip_status == 'O':
+            for i in rr:
+                i.pas_status = "E"
+                i.today = showtime1
+                i.save()
+            ride.trip_status = 'E'
+            ride.save()
+            return Response({'status':1 ,"msg": f"Trip Complete"})
+        if ride.trip_status == 'E':
+            return Response({'status':1 ,"msg": f"Trip Complete"})
+              
     except ObjectDoesNotExist:
         return Response({'status':0 ,"msg": "Something Wrong"})
 
@@ -1378,55 +1475,6 @@ def BlockStatusForDriver(request,pk):
         return Response({'status':0,'msg':'Unblock'})
     else:
         return Response({'status':1,'msg':'Block'})
-    
-# @api_view(['POST'])
-# def tripsetting(request,pk):
-#     try:
-#         showtime1 = strftime("%Y-%m-%d", )
-#         ride = Trip.objects.get(id=pk)
-#         rid = Trip.objects.filter(getdr=ride.getdr,vehicle=ride.vehicle,Location=ride.Location,destination=ride.destination,trip_date=ride.trip_date,)
-#         rr = rid.count()
-#         serial = TripcountSerial(rid,many=True)
-#         if ride.trip_status == 'P':
-#             for i in rid:
-#                 if i.trip_status == 'P':
-#                     i.trip_status = 'O'
-#                     i.save()
-#             return Response({'status':1 ,"msg": f"Trip Started And You Have {rr} Passenger",'data' : serial.data})
-        
-#         if ride.trip_status == 'O':
-#             for i in rid:
-#                 if i.trip_status == 'O':
-#                     i.trip_status = 'E'
-#                     i.status = 'E'
-#                     i.pick_status = 'D'
-#                     i.today = showtime1
-#                     i.save()
-#             return Response({'status':1 ,"msg": f"Trip Complete And You Have {rr} Passenger",'data' : serial.data})
-#     except ObjectDoesNotExist:
-#         return Response({'status':0 ,"msg": "Fail"})
-    
-# @api_view(['POST'])
-# def pickstatus(request,pk):
-#     try:
-#         ride = Trip.objects.get(id=pk)
-#         if ride.trip_status == 'O':
-#             if ride.pick_status == 'W':
-#                 ride.pick_status = 'P'
-#                 ride.save()
-#                 return Response({'status':1 ,"msg": "Passenger Picked"})
-#             if ride.pick_status == 'P':
-#                 ride.pick_status = 'D'
-#                 ride.status = 'E'
-#                 ride.save()
-#                 return Response({'status':1 ,"msg": "Passenger Droped"})
-#             if ride.pick_status == 'D':
-#                 return Response({'status':1 ,"msg": "Passenger Droped"})
-                
-#         else:
-#             return Response({'status':0 ,"msg": "You Can't Start Trip"})
-#     except ObjectDoesNotExist:
-#         return Response({'status':0 ,"msg": "Fail"})
 
 @api_view(['POST'])
 def ContactUsDriver(request):
@@ -1513,12 +1561,14 @@ def BidDetalis(request,pk,dd):
         ri = Ride.objects.get(id=pk,publish='1')
         print(ri.as_user)
         if ri.as_user == 'Passenger':
-            di = Ride_pin.objects.filter(getride=ri.id,getdriver=dd).exclude(status='2')
+            di = Ride_pin.objects.filter(getride=ri.id,getdriver=dd).exclude(status='2')            
             if di[0].status == '1':
                 context = {
                     'status':1,
                     'msg':'success',
                     'id':ri.id,
+                    # 'rate':rate,
+                    # 'report':repo,
                     'pickup' : ri.pickUp.capitalize(),
                     'pickup_address1' : ri.pickup_address1.capitalize(),
                     'pickup_address2' : ri.pickup_address2.capitalize(),
@@ -1542,6 +1592,8 @@ def BidDetalis(request,pk,dd):
                     'status':1,
                     'msg':'success',
                     'id':ri.id,
+                    # 'rate':rate,
+                    # 'report':repo,
                     'pickup' : ri.pickUp.capitalize(),
                     'pickup_address1' : ri.pickup_address1.capitalize(),
                     'pickup_address2' : ri.pickup_address2.capitalize(),

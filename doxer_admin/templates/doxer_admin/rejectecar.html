@@ -15,11 +15,11 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> All Accepted Cars </h3>
+              <h3 class="page-title"> All Rejected Cars </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item" style='color:green;'><b>Cars</b></li>
-                  <li class="breadcrumb-item active" aria-current="page">Accepted Cars</li>
+                  <li class="breadcrumb-item active" aria-current="page">Rejected Cars</li>
                 </ol>
               </nav>
             </div>
@@ -29,8 +29,8 @@
                   <div class="card-body">
                     <ul class="breadcrumb justify-content-center">
                         <li><a class='btn btn-sm btn-warning btn-rounded' href="{% url 'doxer_admin:allcars' %}">Pending</a>&nbsp;</li>
-                        <li><a class='btn btn-sm btn-info btn-rounded' href='javascript:void(0);'>Accepted</a>&nbsp;</li>
-                        <li><a class='btn btn-sm btn-danger btn-rounded' href="{% url 'doxer_admin:rejectedcar' %}">Rejected</a>&nbsp;</li>
+                        <li><a class='btn btn-sm btn-success btn-rounded' href='{% url 'doxer_admin:acceptedcar' %}'>Accepted</a>&nbsp;</li>
+                        <li><a class='btn btn-sm btn-info btn-rounded' href="javascript:void(0);">Rejected</a>&nbsp;</li>
                     </ul>
                     <table class="table table-striped">
                       <thead>
@@ -65,7 +65,7 @@
           </div>
       {% include 'home/foot.html' %}
       <script>
-        {% include 'ajax/acceptedcar.js' %}
+        {% include 'ajax/rejectedcar.js' %}
       </script>
   </body>
 </html>

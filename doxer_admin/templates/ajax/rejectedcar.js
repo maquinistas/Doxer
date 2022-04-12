@@ -31,7 +31,7 @@ $('.pagination li.page-item').on('click',function(){
         $.ajax({
             type: "POST",
             // define url name
-            url: "{% url 'doxer_admin:acceptedcar' %}", 
+            url: "{% url 'doxer_admin:rejectedcar' %}", 
             data : {    
                 page_no : page_no, 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -83,7 +83,7 @@ $("#next-page").on('click',function(){
         $.ajax({
             type: "POST",
             // define url name
-            url: "{% url 'doxer_admin:acceptedcar' %}", 
+            url: "{% url 'doxer_admin:rejectedcar' %}", 
             data : {    
                 page_no : nextpage, 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -140,7 +140,7 @@ $("#prev-page").on('click',function(){
         $.ajax({
             type: "POST",
             // define url name
-            url: "{% url 'doxer_admin:acceptedcar' %}", 
+            url: "{% url 'doxer_admin:rejectedcar' %}", 
             data : {    
                 page_no : nextpage, 
                 csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -189,7 +189,7 @@ $(document).ready(function(){
     var page_no = 1;
     $.ajax({
         type: "POST",
-        url: "{% url 'doxer_admin:acceptedcar' %}", 
+        url: "{% url 'doxer_admin:rejectedcar' %}", 
         data : {'page_no' : page_no, csrfmiddlewaretoken: '{{ csrf_token }}'},
         // handle a successful response
         success: function (data) {
