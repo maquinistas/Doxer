@@ -15,15 +15,6 @@ from django.db.models import Max
 email_pattern = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$' 
 mobile_pattern = '^[0-9]{10}$'
 
-# from datetime import datetime
-# time = datetime.now().time()
-# print(time)
-# start_week = date - datetime.timedelta(date.weekday())
-# end_week = start_week + datetime.timedelta(7)
-# entries = Entry.objects.filter(created_at__range=[start_week, end_week])
-
-
-
 import math,random
 import re
 def genrateOtp():

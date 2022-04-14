@@ -348,33 +348,7 @@ class CarListingSerializer(serializers.ModelSerializer):
         representation["id"] = instance.id
         representation['Car_name'] = f'{instance.vehical_variant.brand.brand} {instance.vehical_variant.cars}'
         return representation
-
-# class Id_proofeSerializerForDriver(serializers.ModelSerializer):
-#     class Meta:
-#         model = Id_proofe
-
-#     def to_representation(self, instance):
-#         representation = dict()
-#         representation["id"] = instance.id
-#         representation['Name'] = instance.driverid.name
-#         representation['Image1'] = instance.image1.url
-#         representation['Image2'] = instance.image2.url
-#         representation['status'] = instance.status
-#         return representation
-    
-# class Id_proofeSerializerForPassenger(serializers.ModelSerializer):
-#     class Meta:
-#         model = Id_proofe
-
-#     def to_representation(self, instance):
-#         representation = dict()
-#         representation["id"] = instance.id
-#         representation['Name'] = instance.passengerid.name
-#         representation['Image1'] = instance.image3.url
-#         representation['Image2'] = instance.image4.url
-#         representation['status'] = instance.status
-#         return representation
-    
+   
 class HistoryViewForDriver(serializers.ModelSerializer):
     class Meta:
         model = Search_History

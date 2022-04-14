@@ -68,7 +68,3 @@ admin.site.register(Drivers_Rating)
 admin.site.register(Passenger_Rating)
 admin.site.register(Ride_pin,ridepin)
 admin.site.register(Vehicle,vehicaladmin)
-
-
-
-

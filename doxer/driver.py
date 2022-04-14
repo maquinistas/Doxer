@@ -24,6 +24,7 @@ def convert(date_time):
     datetime_str = datetime.datetime.strptime(date_time, format)
     realtime = datetime_str.strftime('%H:%M')
     return realtime 
+
 # Driver code
 # Create your views here.
 

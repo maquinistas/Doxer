@@ -48,7 +48,6 @@ def SerachCities(request):
     else:
         return Response({'status':0 ,"msg":"Record Not Founded"})
 
-# Get All Ride Information
 @api_view(['GET'])
 def GetRides(request):
     ride = Ride.objects.all()

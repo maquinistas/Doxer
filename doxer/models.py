@@ -211,3 +211,4 @@ class Car_Details(models.Model):
     seating_capacity = models.CharField(db_column='Seating Capacity', max_length=8, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     no_of_seating_rows = models.CharField(db_column='No of Seating Rows', max_length=6, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     bootspace = models.CharField(db_column='Bootspace', max_length=10, blank=True, null=True)  # Field name made lowercase.
+    
