@@ -106,14 +106,10 @@ passengerurl = [
 ]
 
 viewurl = [
-    # path(r"get-all-rides-with-status/",views.GetRides),
     path(r"get-city/",views.SerachCities),
     path(r"get-all-city/",views.AllCities),
-    # path(r"get-all-bookings/",views.GetAllBookings),
-    # path(r"get-all-rides/",views.GetAllRides),
     path(r"get-all-brands/",views.ShowAllBrand),
     path(r"get-car-name-of-brand-<str:pk>/",views.ShowCarOfBrand),
-    # path(r"get-model-of-car-<str:pk>/",views.ShowCarsModels),
 ]
 
 urlpatterns = driverurl + passengerurl + viewurl
