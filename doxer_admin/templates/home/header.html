@@ -1,17 +1,4 @@
 {% load static %}
-<style>
-  .navbar .navbar-brand-wrapper .navbar-brand img{
-    height : 150px;
-    width : 150px;
-    max-width: 201%;
-    margin: auto;
-    margin-top : 65px;
-    vertical-align: middle;
-  }
-  a.documentview{
-    cursor: pointer;
-  }
-</style>
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="navbar-brand-wrapper d-flex align-items-center">
       <a class="navbar-brand brand-logo" href="javascript:void(0);">  
@@ -89,10 +76,11 @@
           </div>
         </li-->
         <li class="nav-item dropdown d-none d-xl-inline-flex user-dropdown">
-          <a class="nav-link dropdown-toggle" id="UserDropdown" href="javascript:void(0);" data-toggle="dropdown" aria-expanded="false">
-            <!--img class="img-xs rounded-circle ml-2" src="{% static 'images/faces/face8.jpg' %}" alt="Profile image"> <span class="font-weight-normal"> Admin </span></a-->
+          <a class="dropdown-item log-out-btn" href="{% url 'doxer_admin:Logoutadin' %}"><i class="dropdown-item-icon icon-power text-danger"></i> Sign Out</a>
+          <!--a class="nav-link dropdown-toggle" id="UserDropdown" href="javascript:void(0);" data-toggle="dropdown" aria-expanded="false">
             <span class="font-weight-normal"> Admin </span>
-          </a>
+            {% comment %} <img class="img-xs rounded-circle ml-2" src="{% static 'images/faces/face8.jpg' %}" alt="Profile image"> <span class="font-weight-normal"> Admin </span></a> {% endcomment %}
+          </a-->
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
             <!--div class="dropdown-header text-center">
               <img class="img-md rounded-circle" src="{% static 'images/faces/face8.jpg' %}" alt="Profile image">

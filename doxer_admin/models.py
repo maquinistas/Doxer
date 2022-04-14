@@ -5,3 +5,4 @@ from django.db import models
 class admin_credentials(models.Model):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
+    

@@ -51,11 +51,6 @@ def genrateOtp():
       
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from django.utils import timezone
-ls = strftime("%M")
-print(ls)
-print(ls[0:2])
-# print(ls[3:6],'-------',strftime("%H:%M"))
 @api_view(['POST'])
 def SignUpDriver(request):
     if request.method  == "POST":
@@ -65,6 +60,7 @@ def SignUpDriver(request):
         per_km_price = '00' #data['per_km_price']
         raw = data['email_or_num'].casefold()
         nks = data['token']
+        DeviceId = data['DeviceId']
         otp = genrateOtp()
         if(not raw):
             return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Required"})
@@ -80,108 +76,119 @@ def SignUpDriver(request):
         if(not cpassword):
             return Response({'status' : 0 , 'msg' : "Confirm Password Field Is Required"})
         
-        if(re.search(mobile_pattern,raw)):
-            em = '' 
-            num = Driver.objects.filter(contact_no=raw)
-            if len(num) > 0:
-                getid = Driver.objects.get(id=num[0].id)
-                if getid.status == 'Deactivate':
-                    return Response({'status' : 0 , 'msg' : "This Account has been Block"})
-                else:
-                    if getid.active_ac_with_otp == "0":
-                        if password != cpassword:
-                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                        else:
-                            getid.password = make_password(password)
-                            getid.cpassword = cpassword
-                            getid.otp = otp
-                            getid.name = name
-                            getid.fare_per_km = per_km_price
-                            getid.status = 'Active'
-                            getid.create_at = showtime
-                            getid.update_at = showtime
-                            getid.ntk = nks
-                            getid.save()
-                            # send_sms(
-                            #         f'Hii {getid.name} \n Your Verification Code Is Here \n {getid.otp} ',
-                            #         '+91634545811120',
-                            #         [getid.contact_no,]
-                            # )
-                            return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':"Mobile",'OTP':getid.otp})
+        devi = Driver.objects.filter(DeviceId=DeviceId,status = 'Deactive')
+        if len(devi) > 0:
+            devis = Driver.objects.filter(DeviceId=DeviceId)
+            for i in devis:
+                i.status = 'Deactive'
+                i.save()
+            return Response({'status' : 0 , 'msg' : "This Device has Block By Admin"})
+        else:   
+            if(re.search(mobile_pattern,raw)):
+                em = '' 
+                num = Driver.objects.filter(contact_no=raw)
+                if len(num) > 0:
+                    getid = Driver.objects.get(id=num[0].id)
+                    if getid.status == 'Deactivate':
+                        return Response({'status' : 0 , 'msg' : "This Account has been Block"})
                     else:
-                        return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Used"})  
-            else:
-                mo = raw     
-        elif(re.search(email_pattern, raw)):
-            mo = ''
-            mail = Driver.objects.filter(email=raw)
-            if len(mail) > 0:
-                getid = Driver.objects.get(id=mail[0].id)
-                if getid.status == 'Deactivate':
-                    return Response({'status' : 0 , 'msg' : "This Account has been Block"})
-                else:
-                    if getid.active_ac_with_otp == "0":
-                        if password != cpassword:
-                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                        if getid.active_ac_with_otp == "0":
+                            if password != cpassword:
+                                    return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                            else:
+                                getid.password = make_password(password)
+                                getid.cpassword = cpassword
+                                getid.otp = otp
+                                getid.name = name
+                                getid.fare_per_km = per_km_price
+                                getid.status = 'Active'
+                                getid.create_at = showtime
+                                getid.DeviceId = DeviceId
+                                getid.update_at = showtime
+                                getid.ntk = nks
+                                getid.save()
+                                # send_sms(
+                                #         f'Hii {getid.name} \n Your Verification Code Is Here \n {getid.otp} ',
+                                #         '+91634545811120',
+                                #         [getid.contact_no,]
+                                # )
+                                return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':"Mobile",'OTP':getid.otp})
                         else:
-                            getid.password = make_password(password)
-                            getid.cpassword = cpassword
-                            getid.otp = otp
-                            getid.name = name
-                            getid.fare_per_km = per_km_price
-                            getid.create_at = showtime
-                            getid.update_at = showtime
-                            getid.status = 'Active'
-                            getid.ntk = nks
-                            getid.save()
-                            mail_subject = 'Sign Up With Otp.'
-                            message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
-                            email_from = settings.EMAIL_HOST_USER
-                            to_email = [getid.email,]
-                            send_mail(mail_subject, message, email_from, to_email)
-                            return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':'Email','OTP':getid.otp})
+                            return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Used"})  
+                else:
+                    mo = raw     
+            elif(re.search(email_pattern, raw)):
+                mo = ''
+                mail = Driver.objects.filter(email=raw)
+                if len(mail) > 0:
+                    getid = Driver.objects.get(id=mail[0].id)
+                    if getid.status == 'Deactivate':
+                        return Response({'status' : 0 , 'msg' : "This Account has been Block"})
                     else:
-                        return Response({'status' : 0 , 'msg' : "Email Is Alread Used"})
+                        if getid.active_ac_with_otp == "0":
+                            if password != cpassword:
+                                    return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                            else:
+                                getid.password = make_password(password)
+                                getid.cpassword = cpassword
+                                getid.otp = otp
+                                getid.name = name
+                                getid.fare_per_km = per_km_price
+                                getid.create_at = showtime
+                                getid.update_at = showtime
+                                getid.status = 'Active'
+                                getid.ntk = nks
+                                getid.DeviceId = DeviceId
+                                getid.save()
+                                mail_subject = 'Sign Up With Otp.'
+                                message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
+                                email_from = settings.EMAIL_HOST_USER
+                                to_email = [getid.email,]
+                                send_mail(mail_subject, message, email_from, to_email)
+                                return Response({'status' : 1,'msg':'Driver Register Succesfully',"Id":getid.id,'Type':'Email','OTP':getid.otp})
+                        else:
+                            return Response({'status' : 0 , 'msg' : "Email Is Alread Used"})
+                else:
+                    em = raw
             else:
-                em = raw
-        else:
-            return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Not Valid"})
+                return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Not Valid"})
 
-        if password != cpassword:
-            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-        else:
-            driver = Driver.objects.create(
-                email_or_num = raw,
-                name = name,
-                fare_per_km = per_km_price,
-                email = em,
-                contact_no= mo,
-                password = password,
-                cpassword = cpassword,
-                status = 'Active',
-                ntk = nks,
-                create_at = showtime,
-                update_at = showtime,
-            )
-            driver.password = make_password(driver.password)
-            driver.cpassword = driver.cpassword
-            driver.otp = otp
-            driver.save()
-            if driver.email:
-                types = 'Email'
-                mail_subject = 'Sign Up With Otp.'
-                message = f'Hi {driver.name},\n Mail Sent Properly \n Otp is:-\'{driver.otp}\'\n Thank You' 
-                email_from = settings.EMAIL_HOST_USER
-                to_email = [driver.email,]
-                send_mail(mail_subject, message, email_from, to_email)
-            if driver.contact_no:
-                types = 'Mobile'
-                # send_sms(
-                #         f'Hii {driver.name} \n Your Verification Code Is Here \n {driver.otp} ',
-                #         '+91634545811120',
-                #         [driver.contact_no,]
-                # )
-        return Response({'status' : 1,'msg':'Driver Register Succesfully','Id' :driver.id,'Type':types,'OTP':driver.otp})
+            if password != cpassword:
+                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+            else:
+                driver = Driver.objects.create(
+                    email_or_num = raw,
+                    name = name,
+                    fare_per_km = per_km_price,
+                    email = em,
+                    contact_no = mo,
+                    DeviceId = DeviceId,
+                    password = password,
+                    cpassword = cpassword,
+                    status = 'Active',
+                    ntk = nks,
+                    create_at = showtime,
+                    update_at = showtime,
+                )
+                driver.password = make_password(driver.password)
+                driver.cpassword = driver.cpassword
+                driver.otp = otp
+                driver.save()
+                if driver.email:
+                    types = 'Email'
+                    mail_subject = 'Sign Up With Otp.'
+                    message = f'Hi {driver.name},\n Mail Sent Properly \n Otp is:-\'{driver.otp}\'\n Thank You' 
+                    email_from = settings.EMAIL_HOST_USER
+                    to_email = [driver.email,]
+                    send_mail(mail_subject, message, email_from, to_email)
+                if driver.contact_no:
+                    types = 'Mobile'
+                    # send_sms(
+                    #         f'Hii {driver.name} \n Your Verification Code Is Here \n {driver.otp} ',
+                    #         '+91634545811120',
+                    #         [driver.contact_no,]
+                    # )
+            return Response({'status' : 1,'msg':'Driver Register Succesfully','Id' :driver.id,'Type':types,'OTP':driver.otp})
 
 @api_view(["POST"])
 def LoginDriver(request):
@@ -189,56 +196,73 @@ def LoginDriver(request):
     raw = data['email_or_num'].casefold()
     getpass = data['password']
     nks = data['token']
+    DeviceId = data['DeviceId']
     if(not raw):
         return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Required"})
     if(not getpass):
             return Response({"status" : 0 , "msg" : "Password Is Required"})
-        
-    if(re.search(mobile_pattern,raw)):
-        num = Driver.objects.filter(contact_no=raw)
-        if len(num) > 0:
-            dri = Driver.objects.get(id=num[0].id)
-            if dri.active_ac_with_otp == "0":
+    
+    devi = Driver.objects.filter(DeviceId=DeviceId,status = 'Deactive')
+    if len(devi) > 0:
+        devis = Driver.objects.filter(DeviceId=DeviceId)
+        for i in devis:
+            i.status = 'Deactive'
+            i.save()
+        return Response({'status' : 0 , 'msg' : "This Device has Block By Admin"})
+    else:       
+        if(re.search(mobile_pattern,raw)):
+            num = Driver.objects.filter(contact_no=raw)
+            if len(num) > 0:
+                dri = Driver.objects.get(id=num[0].id)
+                if dri.active_ac_with_otp == "0":
+                    return Response({"status" : 0 , "msg" : "Unknow User"})
+                else:
+                    if dri.status == 'Active':
+                        passwrd = check_password(getpass, dri.password)
+                        if passwrd:
+                            # if dri.DeviceId == None:
+                            #     dri.DeviceId = DeviceId
+                            #     dri.save()
+                            #     print("please add Driverid with num",DeviceId)
+                            dri = Driver.objects.get(id=dri.id)
+                            dri.ntk = nks
+                            dri.save()
+                            Driver_name = dri.name #if dri.name else dri.email_or_num
+                            return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Driver_name':Driver_name})
+                        else:
+                            return Response({"status" : 0 , "msg" : "Password Is Wrong"})
+                    else:
+                        return Response({"status" : 0 , "msg" : "Account Is Blocked"})
+                        
+            else:
                 return Response({"status" : 0 , "msg" : "Unknow User"})
-            else:
-                if dri.status == 'Active':
-                    passwrd = check_password(getpass, dri.password)
-                    if passwrd:
-                        dri = Driver.objects.get(id=dri.id)
-                        dri.ntk = nks
-                        dri.save()
-                        Driver_name = dri.name #if dri.name else dri.email_or_num
-                        return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Driver_name':Driver_name})
-                    else:
-                        return Response({"status" : 0 , "msg" : "Password Is Wrong"})
+        elif(re.search(email_pattern, raw)):
+            mail = Driver.objects.filter(email=raw)
+            if len(mail) > 0:
+                dri = Driver.objects.get(id=mail[0].id)
+                if dri.active_ac_with_otp == "0":
+                    return Response({"status" : 0 , "msg" : "Account Is Not Created"})
                 else:
-                    return Response({"status" : 0 , "msg" : "Account Is Blocked"})
-                    
-        else:
-            return Response({"status" : 0 , "msg" : "Unknow User"})
-    elif(re.search(email_pattern, raw)):
-        mail = Driver.objects.filter(email=raw)
-        if len(mail) > 0:
-            dri = Driver.objects.get(id=mail[0].id)
-            if dri.active_ac_with_otp == "0":
-                return Response({"status" : 0 , "msg" : "Account Is Not Created"})
-            else:
-                if dri.status == 'Active':
-                    passwrd = check_password(getpass, dri.password)
-                    if passwrd:
-                        dri = Driver.objects.get(id=dri.id)
-                        dri.ntk = nks
-                        dri.save()
-                        Driver_name = dri.name #if dri.name else dri.email_or_num
-                        return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Driver_name':Driver_name})
+                    if dri.status == 'Active':
+                        passwrd = check_password(getpass, dri.password)
+                        if passwrd:
+                            # if dri.DeviceId == None:
+                            #     dri.DeviceId = DeviceId
+                            #     dri.save()
+                            #     print("please add Driverid",DeviceId)
+                            dri = Driver.objects.get(id=dri.id)
+                            dri.ntk = nks
+                            dri.save()
+                            Driver_name = dri.name #if dri.name else dri.email_or_num
+                            return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Driver_name':Driver_name})
+                        else:
+                            return Response({"status" : 0 , "msg" : "Password Is Wrong"})
                     else:
-                        return Response({"status" : 0 , "msg" : "Password Is Wrong"})
-                else:
-                    return Response({"status" : 0 , "msg" : "Account Is Blocked"})
+                        return Response({"status" : 0 , "msg" : "Account Is Blocked"})
+            else:
+                return Response({"status" : 0 , "msg" : "Unknow User"})  
         else:
-            return Response({"status" : 0 , "msg" : "Unknow User"})  
-    else:
-        return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Not Valid"})
+            return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Not Valid"})
 
 @api_view(["POST"])
 def VerifyOtpDriver(request):
@@ -511,88 +535,90 @@ def AddRideForCar(request,pk):
         tims = re.sub(" ","",time)
         
         ride_time = f"{str(date)} {str(convert(tims))}"
-        rideserach = Ride.objects.filter(getdriver = getdriver,pickUp = pick,dropout = drop,date = date,car = cars,publish='1',trip_status="P")
+        rideserach = Ride.objects.filter(getdriver = getdriver,date = date,car = cars,publish='1',trip_status="P").exclude(status='2')
         
-        # if len(rideserach) > 0:
-        #     for i in rideserach:
-        #         print(i.id)
-        #     return Response({"status" : 0 , "msg" : f"Car Is Already Book For This Date {date}"})
-        # else:
-        addrsd = Ride.objects.filter(
-            as_user = 'Driver',
-            getdriver = getdriver,
-            pickUp = pick,
-            dropout = drop,
-            date = date,
-            car = cars,
-            ride_type = "C",
-            publish = "0"
-        )
-        if len(addrsd) > 0:
-            addrsd[0].pickUp_latitude = pickUp_latitude
-            addrsd[0].pickUp_longitude = pickUp_longitude
-            addrsd[0].car_latitude = pickUp_latitude
-            addrsd[0].car_longitude = pickUp_longitude
-            addrsd[0].dropout_latitude = dropout_latitude
-            addrsd[0].dropout_longitude = dropout_longitude
-            addrsd[0].capacity = capacity
-            addrsd[0].seats = seats
-            addrsd[0].Max_seats = seats
-            addrsd[0].fees = fees
-            addrsd[0].route = route
-            addrsd[0].pickup_address1 = pickup_address1
-            addrsd[0].pickup_address2 = pickup_address2
-            addrsd[0].dropout_address1 = dropout_address1
-            addrsd[0].dropout_address2 = dropout_address2
-            addrsd[0].add_information = add_information
-            addrsd[0].ride_time = ride_time
-            addrsd[0].create_at = showtime
-            addrsd[0].update_at = showtime
-            addrsd[0].save()
-            return Response({
-                "Ride_Id" : addrsd[0].id,
-                "status":1,
-                "msg":"Ride Added Successfully"
-                })
+        if len(rideserach) > 0:
+            for i in rideserach:
+                print(i.id)
+            return Response({"status" : 0 , "msg" : f"This Car Is Already Book For This Date {date}"})
         else:
-            addrid = Ride.objects.create(
+            addrsd = Ride.objects.filter(
                 as_user = 'Driver',
                 getdriver = getdriver,
-                pickUp_latitude = pickUp_latitude,
-                pickUp_longitude = pickUp_longitude,
-                car_latitude = pickUp_latitude,
-                car_longitude = pickUp_longitude,
-                dropout_latitude = dropout_latitude,
-                dropout_longitude = dropout_longitude,
                 pickUp = pick,
                 dropout = drop,
                 date = date,
                 car = cars,
-                route = route,
-                time = time,
-                dtime = dtime,
                 ride_type = "C",
-                capacity = capacity,
-                seats = seats,
-                Max_seats = seats,
-                fees = fees,
-                pickup_address1 = pickup_address1,
-                pickup_address2 = pickup_address2,
-                dropout_address1 = dropout_address1,
-                dropout_address2 = dropout_address2,
-                # pet_allowed = pet,
-                # max_seat_in_back = seatinback,
-                # smoke_allowed = smoke,
-                ride_time = ride_time,
-                add_information = add_information,
-                create_at = showtime,
-                update_at = showtime
+                publish = "0"
             )
-            return Response({
-                "Ride_Id" : addrid.id,
-                "status":1,
-                "msg":"Ride Added Successfully"
-                })
+            if len(addrsd) > 0:
+                addrsd[0].pickUp_latitude = pickUp_latitude
+                addrsd[0].pickUp_longitude = pickUp_longitude
+                addrsd[0].car_latitude = pickUp_latitude
+                addrsd[0].car_longitude = pickUp_longitude
+                addrsd[0].dropout_latitude = dropout_latitude
+                addrsd[0].dropout_longitude = dropout_longitude
+                addrsd[0].capacity = capacity
+                addrsd[0].seats = seats
+                addrsd[0].Max_seats = seats
+                addrsd[0].fees = fees
+                addrsd[0].per_km = per_price
+                addrsd[0].route = route
+                addrsd[0].pickup_address1 = pickup_address1
+                addrsd[0].pickup_address2 = pickup_address2
+                addrsd[0].dropout_address1 = dropout_address1
+                addrsd[0].dropout_address2 = dropout_address2
+                addrsd[0].add_information = add_information
+                addrsd[0].ride_time = ride_time
+                addrsd[0].create_at = showtime
+                addrsd[0].update_at = showtime
+                addrsd[0].save()
+                return Response({
+                    "Ride_Id" : addrsd[0].id,
+                    "status":1,
+                    "msg":"Ride Added Successfully"
+                    })
+            else:
+                addrid = Ride.objects.create(
+                    as_user = 'Driver',
+                    getdriver = getdriver,
+                    pickUp_latitude = pickUp_latitude,
+                    pickUp_longitude = pickUp_longitude,
+                    car_latitude = pickUp_latitude,
+                    car_longitude = pickUp_longitude,
+                    dropout_latitude = dropout_latitude,
+                    dropout_longitude = dropout_longitude,
+                    pickUp = pick,
+                    dropout = drop,
+                    date = date,
+                    per_km = per_price,
+                    car = cars,
+                    route = route,
+                    time = time,
+                    dtime = dtime,
+                    ride_type = "C",
+                    capacity = capacity,
+                    seats = seats,
+                    Max_seats = seats,
+                    fees = fees,
+                    pickup_address1 = pickup_address1,
+                    pickup_address2 = pickup_address2,
+                    dropout_address1 = dropout_address1,
+                    dropout_address2 = dropout_address2,
+                    # pet_allowed = pet,
+                    # max_seat_in_back = seatinback,
+                    # smoke_allowed = smoke,
+                    ride_time = ride_time,
+                    add_information = add_information,
+                    create_at = showtime,
+                    update_at = showtime
+                )
+                return Response({
+                    "Ride_Id" : addrid.id,
+                    "status":1,
+                    "msg":"Ride Added Successfully"
+                    })
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong Or Data Missing"})
 
@@ -895,13 +921,11 @@ def RidesBookingFilter(request,pk):
             repo = Passenger_Report.objects.filter(tri=instance.id,mine=instance.passengerid.id,driverid=instance.getdriver.id)
             representations = {}
             representations['bid'] = instance.id
-            if len(ratw) > 0:
+            if len(ratw) > 0 or len(repo) > 0:
                 representations['rat'] = "Yes"
-            else:
-                representations['rat'] = "No"
-            if len(repo) > 0:
                 representations['report'] = "Yes"
             else:
+                representations['rat'] = "No"
                 representations['report'] = "No"
             representations['Passenger_id'] = instance.passengerid.id
             representations['passenger_name'] = instance.passengerid.name
@@ -1404,20 +1428,25 @@ def tripsetting(request,pk):
         tomorrow = date + datetime.timedelta(days=1)
         showtime1 = strftime("%Y-%m-%d", )
         hour = strftime("%H")
+        mins = strftime("%M")
         ride = Ride.objects.get(id=pk,publish='1')
         rr = Ride_pin.objects.filter(getride=ride.id)
         hh = ride.ride_time.strftime("%H")
+        mi = ride.ride_time.strftime("%M")
         mm = ride.ride_time.strftime("%I:%M %p")
         if ride.trip_status == 'P':
             if str(ride.date) == str(showtime1):
                 if int(hh) <= int(hour):
-                    # return Response({'status':0 ,"msg": f'Ride start Beacuse Now {hour}:{mins}',"ride_date" : f"{hour}:{mins}"})
-                # show = TripcountSerial(rr,many=True)
-                # if str(ride.ride_time) == showtime1:
-                # if ride.trip_status == 'P':
-                    ride.trip_status = 'O'
-                    ride.save()
-                    return Response({'status':1 ,"msg": f"Trip Started"})
+                    if (int(mi) <= int(mins)) or (int(hh) < int(hour) and int(mi) >= int(mins)):
+                        ride.trip_status = 'O'
+                        for i in rr:
+                            if i.status == '0':
+                                i.status = '2'
+                                i.save()
+                        ride.save()
+                        return Response({'status':1 ,"msg": f"Trip Started"})
+                    else:
+                        return Response({'status':0 ,"msg": f"Wait For Few Minutes"})
                 else:
                     return Response({'status':0 ,"msg": f"Ride Can't start Beacuse Ride Time is {mm}","ride_date" : f"{mm}"})
             else:
@@ -1438,12 +1467,16 @@ def tripsetting(request,pk):
                         
         if ride.trip_status == 'O':
             for i in rr:
-                i.pas_status = "E"
-                i.today = showtime1
-                i.save()
+                if i.status == '1':
+                    i.pas_status = "E"
+                    i.today = showtime1
+                    i.save()
+                if i.status == '2':
+                    i.delete()    
             ride.trip_status = 'E'
             ride.save()
             return Response({'status':1 ,"msg": f"Trip Complete"})
+        
         if ride.trip_status == 'E':
             return Response({'status':1 ,"msg": f"Trip Complete"})
               

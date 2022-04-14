@@ -5,8 +5,8 @@ from . import views
 app_name = "doxer_admin"
 
 urlpatterns = [
-    path('',views.LoginPage,name='loginpage'),
-    path('index/',views.home,name='indexpage'),
+    path('login-page/',views.LoginPage,name='loginpage'),
+    path('',views.home,name='indexpage'),
     path('all-drivers/',views.All_Drivers,name='alldrivers'),
     path('all-passengers/',views.All_Passengers,name='allpassenger'),
     path('all-cars/',views.All_Cars,name='allcars'),

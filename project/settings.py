@@ -64,7 +64,8 @@ MIDDLEWARE = [
 
 ]
 
-# SESSION_EXPIRE_SECONDS = 3600
+# SESSION_EXPIRE_SECONDS = 36
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LOGOUT_REDIRECT_URL = "doxer_admin:loginpage"
 # SMS_BACKEND = 'sms.backends.console.SmsBackend'
 ROOT_URLCONF = 'project.urls'
@@ -95,20 +96,6 @@ WSGI_APPLICATION = 'project.wsgi.application'
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'HOST': 'auth-db663.hostinger.com',
-#         'NAME': 'u383218087_doxer',
-#         'USER' : 'u383218087_doxer',
-#         'PASSWORD' : 'T_2@Fhwak"2Z4*E8',
-#         'PORT' : 3306,
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-#         }   
 #     }
 # }
 

@@ -165,7 +165,7 @@ $('.pagination li.page-item').on('click',function(){
                             var status = '';
                         }
 
-                        buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
+                        buttons = "<button class='btn btn-success btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
                         $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='ProfileImage'/><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td>"+ val.city + "</td><th id='pr"+val.id+"'>₹ "+ val.fare_per_km + "</th><td id='"+val.id+"'>"+ status + "</td><td>"+ val.id_proofe +"</td><td>" + buttons + '</td></tr>')
                         });
@@ -220,7 +220,7 @@ $("#next-page").on('click',function(){
                             var gender = '';
                         }
 
-                        buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
+                        buttons = "<button class='btn btn-success btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
                         if(val.status == 'Active'){
                             //var status = "<input type='checkbox' class='check-blocks' data-sid='" +val.id+ "'>&nbsp;<label class='badge badge-success'>Active</label>";
@@ -291,7 +291,7 @@ $("#prev-page").on('click',function(){
                             var status = '';
                         }
 
-                        buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
+                        buttons = "<button class='btn btn-success btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
                         $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='ProfileImage'/><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td>"+ val.city + "</td><th id='pr"+val.id+"'>₹ "+ val.fare_per_km + "</th><td id='"+val.id+"'>"+ status + "</td><td>"+ val.id_proofe +"</td><td>" + buttons + '</td></tr>')
                         });
@@ -340,9 +340,9 @@ $(document).ready(function(){
                         } else {
                             var status = '';
                         }
-                        buttons = "<button class='btn btn-primary btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
+                        buttons = "<button class='btn btn-success btn-rounded btn-sm edit-btn' data-target='#modelsget' data-toggle='modal' class='identifyingClass' data-sid=" + val.id +"><i class='icon-note btn-icon-append'></i></button>";
 
-                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='ProfileImage'/><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td>"+ val.city + "</td><th id='pr"+val.id+"'>₹ "+ val.fare_per_km + "</th><td id='"+val.id+"'>"+ status + "</td><td>"+ val.id_proofe +"</td><td>" + buttons + '</td></tr>')
+                        $('#tests-table').append("<tr><td> # " + val.id  + "</td><td>" + "<img src=" +val.pro_image + " alt='ProfileImage'/><span class='pl-2'>" + val.username + "</span></td><td>"+ val.email +"</td><td>"+ val.contact_no +"</td><td>" + val.gender + "</td><td>"+ val.city + "</td><th id='pr"+val.id+"'>₹ "+ val.fare_per_km + "</th><td id='"+val.id+"'>"+ status + "</td><td class='documentviewdiv'><div class='doscumentviewdiv'>"+ val.id_proofe +"</div></td><td>" + buttons + '</td></tr>')
                         });
                     }
                 };

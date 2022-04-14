@@ -54,6 +54,7 @@ def SignUpPassanger(request):
         nks =data['token']
         password = data['password']
         cpassword = data['cpassword']
+        DeviceId = data['DeviceId']
         otp = genrateOtp()
         if(not raw):
             return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Required"})
@@ -62,104 +63,115 @@ def SignUpPassanger(request):
         if(not cpassword):
             return Response({'status' : 0 , 'msg' : "Confirm Password Field Is Required"})
         
-        if(re.search(mobile_pattern,raw)):
-            em = '' 
-            num = Passanger.objects.filter(contact_no=raw)
-            if len(num) > 0:
-                getid = Passanger.objects.get(id=num[0].id)
-                if getid.status == 'Deactivate':
-                    return Response({'status' : 0 , 'msg' : "Account Has been Block"})
-                else:
-                    if getid.active_ac_with_otp == '0':
-                        if password != cpassword:
-                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                        else:
-                            getid.password = make_password(password)
-                            getid.cpassword = cpassword
-                            getid.otp = otp
-                            getid.name = name
-                            getid.ntk = nks
-                            getid.create = showtime
-                            getid.update = showtime
-                            getid.save()
-                            return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Mobile",'OTP':getid.otp})
-                    else:
-                        return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Use"})
-            else:
-                mo = raw     
-        elif(re.search(email_pattern, raw)):
-            mo = ''
-            mail = Passanger.objects.filter(email=raw)
-            if len(mail) > 0:
-                getid = Passanger.objects.get(id=mail[0].id)
-                if getid.status == 'Deactivate':
-                    return Response({'status' : 0 , 'msg' : "Account Has been Block"})
-                else:
-                    if getid.active_ac_with_otp == '0':
-                        if password != cpassword:
-                                return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-                        else:
-                            getid.password = make_password(password)
-                            getid.cpassword = cpassword
-                            getid.otp = otp
-                            getid.name = name
-                            getid.ntk = nks
-                            getid.create = showtime
-                            getid.update = showtime
-                            getid.save()
-                            mail_subject = 'Otp Sent With API.'
-                            # message = render_to_string('doxer_admin/mail.html', {
-                            #     'name': getid.name.capitalize(),
-                            #     'otp': getid.otp,
-                            # })
-                            message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
-                            email_from = settings.EMAIL_HOST_USER
-                            to_email = [getid.email,]
-                            send_mail(mail_subject, message, email_from, to_email)
-                            return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Email",'OTP':getid.otp})
-                    else:
-                        return Response({'status' : 0 , 'msg' : "Email Is Alread Use"})
-            else:
-                em = raw  
+        devi = Passanger.objects.filter(DeviceId=DeviceId,status = 'Deactive')
+        if len(devi) > 0:
+            devis = Passanger.objects.filter(DeviceId=DeviceId)
+            for i in devis:
+                i.status = 'Deactive'
+                i.save()
+            return Response({'status' : 0 , 'msg' : "This Device has Block By Admin"})
         else:
-            return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Not Valid"})
-        
-    if password != cpassword:
-        return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
-    else:
-        passanger = Passanger.objects.create(
-            email_or_num = raw,
-            email = em,
-            name = name,
-            ntk = nks,
-            contact_no= mo,
-            password = password,
-            cpassword = cpassword,
-            status = 'Active',
-            create = showtime,
-            update = showtime,
-        )
-        passanger.password = make_password(passanger.password)
-        passanger.cpassword = passanger.cpassword
-        passanger.otp = otp
-        passanger.save()
-        serial = PassangerSerializer(passanger,many=False)
-        if passanger.email:
-            types = 'Email'
-            mail_subject = 'Otp Sent With API.'
-            message = f'Hi {passanger.email},\n Mail Sent Properly \n Otp is:-\'{passanger.otp}\'\n Thank You' 
-            # message = render_to_string('doxer_admin/mail.html', {
-            #                             'name': passanger.name.capitalize(),
-            #                             'otp': passanger.otp,
-            # })
-            email_from = settings.EMAIL_HOST_USER
-            to_email = [raw,]
-            send_mail(mail_subject, message, email_from, to_email)
+            if(re.search(mobile_pattern,raw)):
+                em = '' 
+                num = Passanger.objects.filter(contact_no=raw)
+                if len(num) > 0:
+                    getid = Passanger.objects.get(id=num[0].id)
+                    if getid.status == 'Deactivate':
+                        return Response({'status' : 0 , 'msg' : "Account Has been Block"})
+                    else:
+                        if getid.active_ac_with_otp == '0':
+                            if password != cpassword:
+                                    return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                            else:
+                                getid.password = make_password(password)
+                                getid.cpassword = cpassword
+                                getid.otp = otp
+                                getid.name = name
+                                getid.ntk = nks
+                                getid.DeviceId = DeviceId
+                                getid.create = showtime
+                                getid.update = showtime
+                                getid.save()
+                                return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Mobile",'OTP':getid.otp})
+                        else:
+                            return Response({'status' : 0 , 'msg' : "Phone Num Is Alread Use"})
+                else:
+                    mo = raw     
+            elif(re.search(email_pattern, raw)):
+                mo = ''
+                mail = Passanger.objects.filter(email=raw)
+                if len(mail) > 0:
+                    getid = Passanger.objects.get(id=mail[0].id)
+                    if getid.status == 'Deactivate':
+                        return Response({'status' : 0 , 'msg' : "Account Has been Block"})
+                    else:
+                        if getid.active_ac_with_otp == '0':
+                            if password != cpassword:
+                                    return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+                            else:
+                                getid.password = make_password(password)
+                                getid.cpassword = cpassword
+                                getid.otp = otp
+                                getid.DeviceId = DeviceId
+                                getid.name = name
+                                getid.ntk = nks
+                                getid.create = showtime
+                                getid.update = showtime
+                                getid.save()
+                                mail_subject = 'Otp Sent With API.'
+                                # message = render_to_string('doxer_admin/mail.html', {
+                                #     'name': getid.name.capitalize(),
+                                #     'otp': getid.otp,
+                                # })
+                                message = f'Hi {getid.email},\n Mail Sent Properly \n Otp is:-\'{getid.otp}\'\n Thank You' 
+                                email_from = settings.EMAIL_HOST_USER
+                                to_email = [getid.email,]
+                                send_mail(mail_subject, message, email_from, to_email)
+                                return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :getid.id,'Type':"Email",'OTP':getid.otp})
+                        else:
+                            return Response({'status' : 0 , 'msg' : "Email Is Alread Use"})
+                else:
+                    em = raw  
+            else:
+                return Response({'status' : 0 , 'msg' : "Email Or Phone Number Is Not Valid"})
             
-        if passanger.contact_no:
-            types = 'Mobile'
-            
-        return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :passanger.id,'Type':types,'OTP':passanger.otp})
+        if password != cpassword:
+            return Response({'status' : 0 , 'msg' : "Password Doesn't Match.!"})
+        else:
+            passanger = Passanger.objects.create(
+                email_or_num = raw,
+                email = em,
+                name = name,
+                DeviceId = DeviceId,
+                ntk = nks,
+                contact_no= mo,
+                password = password,
+                cpassword = cpassword,
+                status = 'Active',
+                create = showtime,
+                update = showtime,
+            )
+            passanger.password = make_password(passanger.password)
+            passanger.cpassword = passanger.cpassword
+            passanger.otp = otp
+            passanger.save()
+            serial = PassangerSerializer(passanger,many=False)
+            if passanger.email:
+                types = 'Email'
+                mail_subject = 'Otp Sent With API.'
+                message = f'Hi {passanger.email},\n Mail Sent Properly \n Otp is:-\'{passanger.otp}\'\n Thank You' 
+                # message = render_to_string('doxer_admin/mail.html', {
+                #                             'name': passanger.name.capitalize(),
+                #                             'otp': passanger.otp,
+                # })
+                email_from = settings.EMAIL_HOST_USER
+                to_email = [raw,]
+                send_mail(mail_subject, message, email_from, to_email)
+                
+            if passanger.contact_no:
+                types = 'Mobile'
+                
+            return Response({'status' : 1,'msg':'Passanger Register Succesfully','Id' :passanger.id,'Type':types,'OTP':passanger.otp})
 
 @api_view(['POST'])
 def LoginPassanger(request):
@@ -167,56 +179,65 @@ def LoginPassanger(request):
     raw = data['email_or_num'].casefold()
     getpass = data['password']
     nks = data['token']
+    DeviceId = data['DeviceId']
     if(not raw):
         return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Required"})
     if(not getpass):
             return Response({"status" : 0 , "msg" : "Password Field Is Required"})
-        
-    if(re.search(mobile_pattern,raw)):
-        print("this is Num")
-        num = Passanger.objects.filter(contact_no=raw)
-        if len(num) > 0:
-            pas = Passanger.objects.get(id=num[0].id)
-            if pas.active_ac_with_otp == "0":
-                return Response({"status" : 0 , "msg" : "Account Is Not Created",})
-            else:
-                if pas.status == 'Active':
-                    passwrd = check_password(getpass, pas.password)
-                    if passwrd:
-                        dri = Passanger.objects.get(id=pas.id)
-                        dri.ntk = nks
-                        dri.save()
-                        Passenger_name = dri.name #if dri.name else dri.email_or_num
-                        return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,"Passenger_name":Passenger_name})
-                    else:
-                        return Response({"status" : 0 , "msg" : "Password Is Wrong"})
+    
+    devi = Passanger.objects.filter(DeviceId=DeviceId,status = 'Deactive')
+    if len(devi) > 0:
+        devis = Passanger.objects.filter(DeviceId=DeviceId)
+        for i in devis:
+            i.status = 'Deactive'
+            i.save()
+        return Response({'status' : 0 , 'msg' : "This Device has Block By Admin"})
+    else: 
+        if(re.search(mobile_pattern,raw)):
+            print("this is Num")
+            num = Passanger.objects.filter(contact_no=raw)
+            if len(num) > 0:
+                pas = Passanger.objects.get(id=num[0].id)
+                if pas.active_ac_with_otp == "0":
+                    return Response({"status" : 0 , "msg" : "Account Is Not Created",})
                 else:
-                    return Response({"status" : 0 , "msg" : "Account Is Blocked",})
-        else:
-            return Response({"status" : 0 , "msg" : "Unknow User"})
-    elif(re.search(email_pattern, raw)):
-        mail = Passanger.objects.filter(email=raw)
-        if len(mail) > 0:
-            pas = Passanger.objects.get(id=mail[0].id)
-            if pas.active_ac_with_otp == "0":
-                return Response({"status" : 0 , "msg" : "Account Is Not Created",})
-            else:
-                if pas.status == 'Active':
-                    passwrd = check_password(getpass, pas.password)
-                    if passwrd:
-                        dri = Passanger.objects.get(id=pas.id)
-                        dri.ntk = nks
-                        dri.save()
-                        Passenger_name = dri.name #if dri.name else dri.email_or_num
-                        return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Passenger_name':Passenger_name})
+                    if pas.status == 'Active':
+                        passwrd = check_password(getpass, pas.password)
+                        if passwrd:
+                            dri = Passanger.objects.get(id=pas.id)
+                            dri.ntk = nks
+                            dri.save()
+                            Passenger_name = dri.name #if dri.name else dri.email_or_num
+                            return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,"Passenger_name":Passenger_name})
+                        else:
+                            return Response({"status" : 0 , "msg" : "Password Is Wrong"})
                     else:
-                        return Response({"status" : 0 , "msg" : "Password Is Wrong"})
+                        return Response({"status" : 0 , "msg" : "Account Is Blocked",})
+            else:
+                return Response({"status" : 0 , "msg" : "Unknow User"})
+        elif(re.search(email_pattern, raw)):
+            mail = Passanger.objects.filter(email=raw)
+            if len(mail) > 0:
+                pas = Passanger.objects.get(id=mail[0].id)
+                if pas.active_ac_with_otp == "0":
+                    return Response({"status" : 0 , "msg" : "Account Is Not Created",})
                 else:
-                    return Response({"status" : 0 , "msg" : "Account Is Blocked",})
+                    if pas.status == 'Active':
+                        passwrd = check_password(getpass, pas.password)
+                        if passwrd:
+                            dri = Passanger.objects.get(id=pas.id)
+                            dri.ntk = nks
+                            dri.save()
+                            Passenger_name = dri.name #if dri.name else dri.email_or_num
+                            return Response({"status" : 1 , "msg" : "Login Success","id":dri.id,'Passenger_name':Passenger_name})
+                        else:
+                            return Response({"status" : 0 , "msg" : "Password Is Wrong"})
+                    else:
+                        return Response({"status" : 0 , "msg" : "Account Is Blocked",})
+            else:
+                return Response({"status" : 0 , "msg" : "Unknow User"})  
         else:
-            return Response({"status" : 0 , "msg" : "Unknow User"})  
-    else:
-        return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Not Valid"})
+            return Response({"status" : 0 , "msg" : "Email Or Phone Number Is Not Valid"})
     
 @api_view(['POST'])
 def VerifyOtpPassanger(request):
@@ -486,64 +507,84 @@ def RequestForRide(request,pid,rid):
         pickUp_latitude = data['pickUp_latitude']
         pickUp_longitude = data['pickUp_longitude']
         dropout = data['dropout']
+        km = data['km']
         dropout_latitude = data['dropout_latitude']
         dropout_longitude = data['dropout_longitude']
         pas = data['passenger']
         par = data['parcel']
+        print('----------------------------km :-', km)
         if ridegid.ride_type == "C":
             if pas and par:
                 pas = pas
                 par = par
+                cost = (float(km) * int(pas)) / float(ridegid.per_km)
+                print("cost--------------------->",cost)
                 pasw = ridegid.fees * int(pas)
                 parw = ridegid.fees * int(par)
                 muls = pasw + parw
             if(not par):
                 par = 0
                 pas = pas
-                muls = ridegid.fees * int(pas)
-                
+                if pas == '':
+                    return Response({"status": 0, "msg" : f"Passenger Add"})
+                else:
+                    muls = (float(km) * int(pas)) / float(ridegid.per_km)
+                    
             if(not pas):
                 pas = 0
                 par = par
-                muls = ridegid.fees * int(par)
-            
+                if pas == '':
+                    return Response({"status": 0, "msg" : f"Parcel Add"})
+                else:
+                    muls = ridegid.fees * int(par)
+                
         
         if ridegid.ride_type == "T":
                 pas = 0
                 par = par
-                muls = ridegid.fees * int(par)
+                if pas == '':
+                    return Response({"status": 0, "msg" : f"Parcel Add"})
+                else:
+                    muls = ridegid.fees * int(par)
             
-        if ridegid.status == '0':
-            pasid = Passanger.objects.get(id=pid)
-            driid = ridegid.getdriver
-            getdr = Driver.objects.get(id=driid.id)
-            getbo = Ride_pin.objects.filter(getride=ridegid,passengerid=pasid,status__range=['0','1'])
-            if getbo:
-                return Response({"status": 0, "msg" : f"Already Booked"})
-            else:      
-                createReq = Ride_pin.objects.create(
-                    pickUp = pickUp ,
-                    pickUp_latitude = pickUp_latitude ,
-                    pickUp_longitude = pickUp_longitude ,
-                    dropout = dropout ,
-                    dropout_latitude = dropout_latitude ,
-                    dropout_longitude = dropout_longitude ,
-                    as_user = 'Passenger_bid',
-                    getdriver = getdr,
-                    getride = ridegid,
-                    ride_type = ridegid.ride_type,
-                    ride_date = ridegid.date,
-                    ride_time = ridegid.time,
-                    for_passenger = pas,
-                    fees = muls,
-                    car = ridegid.car,
-                    for_parcel = par,
-                    passengerid = pasid,
-                    request_date = showtime,
-                )
-                return Response({"status": 1, "msg" : f"Request Send To {getdr}","Request_Book_Id" : createReq.id,"Driver_token":getdr.ntk,"Passenger_token":pasid.ntk})
-        else:
-            return Response({"status": 0, "msg" : "This Ride Full"})
+        # if ridegid.status == '0':
+        pasid = Passanger.objects.get(id=pid)
+        driid = ridegid.getdriver
+        getdr = Driver.objects.get(id=driid.id)
+        getbo = Ride_pin.objects.filter(getride=ridegid,passengerid=pasid,status='0').exclude(status='2').order_by('-id')
+        if len(getbo) > 0:
+            if getbo[0].ride_type == 'C':
+                getbo[0].for_passenger = int(getbo[0].for_passenger) + int(pas),
+                getbo[0].fees = int(getbo[0].fees) + int(muls),
+                getbo[0].for_parcel = int(getbo[0].for_parcel) + int(par),
+                getbo[0].save()
+                return Response({"status": 1, "msg" : f"Request Send","Request_Book_Id" : getbo[0].id,"Driver_token":getdr.ntk,"Passenger_token":pasid.ntk})
+            if getbo[0].ride_type == 'T':
+                return Response({"status": 0, "msg" : f"Request Already Send"})
+        else:      
+            createReq = Ride_pin.objects.create(
+                pickUp = pickUp ,
+                pickUp_latitude = pickUp_latitude ,
+                pickUp_longitude = pickUp_longitude ,
+                dropout = dropout ,
+                dropout_latitude = dropout_latitude ,
+                dropout_longitude = dropout_longitude ,
+                as_user = 'Passenger_bid',
+                getdriver = getdr,
+                getride = ridegid,
+                ride_type = ridegid.ride_type,
+                ride_date = ridegid.date,
+                ride_time = ridegid.time,
+                for_passenger = pas,
+                fees = muls,
+                for_parcel = par,
+                car = ridegid.car,
+                passengerid = pasid,
+                request_date = showtime,
+            )
+            return Response({"status": 1, "msg" : f"Request Send","Request_Book_Id" : createReq.id,"Driver_token":getdr.ntk,"Passenger_token":pasid.ntk})
+        # else:
+        #     return Response({"status": 0, "msg" : "This Ride Full"})
     except ObjectDoesNotExist:
         return Response({"status": 0, "msg" : "Id IS wrong"}) 
 
@@ -639,10 +680,10 @@ def SearchForRide(request,dd):
             va = i.route
             if pickup1 in va and dropout1 in va:
                 pi = i.id
-                va = va.index(pickup1)
-                print(va)
-                ls.append(pi)
-        print(ls)  
+                sa = va.index(pickup1)
+                sa1 = va.index(dropout1)
+                if sa < sa1:
+                    ls.append(pi)
         pp = Ride.objects.filter(id__in=ls)
         if len(pp) > 0:
             ls = []
@@ -944,16 +985,14 @@ def OwnBookingFilterDetails(request,pk,pp):
         pa = Passanger.objects.get(id=pp)
         getr = Ride.objects.get(id=pk,as_user='Driver',publish='1')
         rid = Drivers_Rating.objects.filter(tri=pk,mine=getr.getdriver,passengerid=pp)
-        if len(rid) > 0:
-            rid = 'Yes'
-        else:
-            rid = 'No'
         repo = Driver_Report.objects.filter(tri=pk,mine=getr.getdriver,passengerid=pp)
-        if len(repo) > 0:
+        if len(rid) > 0 or len(repo) > 0:
+            rid = 'Yes'
             repo = 'Yes'
         else:
             repo = 'No'
-        getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
+            rid = 'No'
+            getq = Ride_pin.objects.filter(getride=pk,status='1').exclude(passengerid=pp)
         getfe = Ride_pin.objects.filter(getride=pk,passengerid=pp).exclude(status='2')
         print(getfe)
         ls = []

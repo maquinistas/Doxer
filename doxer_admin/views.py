@@ -13,6 +13,7 @@ from time import strftime
 from django.views.decorators.csrf import csrf_exempt
 from .mixins import Directions
 from django.contrib import messages
+import re
 
 # Create your views here.
 car_per_page = 10
@@ -20,6 +21,7 @@ driver_per_page = 10
 passenger_per_page = 10
 rides_per_page = 10
 
+@csrf_exempt
 def home(request):
     if 'id' in request.session:
         showtime = strftime("%Y-%m-%d")
@@ -55,12 +57,15 @@ def home(request):
             return JsonResponse(contax)
         contax = {
             't1' : '1',
+            'dri' : dri.count(),
+            'pas' : pas.count(),
             'title' : "Home Page"
         }
         return render(request,'doxer_admin/index.html',contax)
     else:
         return redirect("doxer_admin:loginpage")
 
+@csrf_exempt
 def LoginPage(request):
     if 'id' in request.session:
         return redirect('doxer_admin:indexpage')
@@ -70,6 +75,7 @@ def LoginPage(request):
         }
         return render(request,'doxer_admin/login.html',contax)
 
+@csrf_exempt
 def All_Drivers(request):
     if 'id' in request.session:
         allu = Driver.objects.exclude(active_ac_with_otp='0').order_by('-id')
@@ -121,7 +127,8 @@ def All_Drivers(request):
                     resa['gender'] = gender
                     resa['city'] = i.city.capitalize()
                     resa['fare_per_km'] = f"{i.fare_per_km}"
-                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
+                    # resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
+                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><div class='face-pile__images-container'><img class='artdeco-entity-image artdeco-entity-image--circle-1 face-pile__image face-pile__image--1 lazy-loaded' alt='IdProofe2' src='{i.image2.url}'><img class='artdeco-entity-image artdeco-entity-image--circle-1 face-pile__image face-pile__image--1 lazy-loaded' alt='IdProofe1' src='{i.image1.url}'></div></a>"
                     resa['status'] = i.status
                     results.append(resa)
 
@@ -135,7 +142,8 @@ def All_Drivers(request):
         return render(request,'doxer_admin/all_drivers.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-  
+
+@csrf_exempt  
 def All_Passengers(request):
     if 'id' in request.session:
         allu = Passanger.objects.exclude(active_ac_with_otp='0').order_by('-id')
@@ -184,8 +192,8 @@ def All_Passengers(request):
                         gender = ''
                     resa['gender'] = gender
                     resa['status'] = i.status
-                    # resa['id_proofe'] = f"<button class='btn btn-light btn-rounded btn-fw btn-sm documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></button>"
-                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
+                    # resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><img src='{i.image1.url}' alt='IdProofe1'><img src='{i.image2.url}' alt='IdProofe2'></a>"
+                    resa['id_proofe'] = f"<a class='documentview' data-target='#IdProofemodel' data-toggle='modal' data='{i.id}'><div class='face-pile__images-container'><img class='artdeco-entity-image artdeco-entity-image--circle-1 face-pile__image face-pile__image--1 lazy-loaded' alt='IdProofe2' src='{i.image2.url}'><img class='artdeco-entity-image artdeco-entity-image--circle-1 face-pile__image face-pile__image--1 lazy-loaded' alt='IdProofe1' src='{i.image1.url}'></div></a>"
                     results.append(resa)
                     if ending_number >= allu.count():
                         b = allu.count()
@@ -197,7 +205,8 @@ def All_Passengers(request):
         return render(request,'doxer_admin/all_passenger.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-   
+
+@csrf_exempt   
 def Rejected_Cars(request):
     if 'id' in request.session:
         allu = Vehicle.objects.filter(status='2').order_by('id')
@@ -257,7 +266,8 @@ def Rejected_Cars(request):
         return render(request,'doxer_admin/rejectecar.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-    
+
+@csrf_exempt    
 def Accepted_Cars(request):
     if 'id' in request.session:
         allu = Vehicle.objects.filter(status='1').order_by('id')
@@ -317,7 +327,8 @@ def Accepted_Cars(request):
         return render(request,'doxer_admin/acceptecar.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-    
+
+@csrf_exempt    
 def All_Cars(request):
     if 'id' in request.session:
         allu = Vehicle.objects.filter(status='0').order_by('id')
@@ -377,7 +388,8 @@ def All_Cars(request):
         return render(request,'doxer_admin/all_cars.html',context)
     else:
         return redirect("doxer_admin:loginpage")
-    
+
+@csrf_exempt    
 def All_Rides(request):
     if 'id' in request.session:
         allu = Ride_pin.objects.filter(status='1').order_by('-pas_status')
@@ -418,10 +430,11 @@ def All_Rides(request):
                 #         cars = 'None '
                 resa = {}
                 resa['id'] = i.id
-                try:
-                    repor = Passenger_Report.objects.get(tri = i.id,driverid = i.getdriver.id,mine = i.passengerid.id)
+                repor = Passenger_Report.objects.filter(tri = i.id,driverid = i.getdriver.id,mine = i.passengerid.id)
+                arepor = Driver_Report.objects.filter(tri = rdie.id,mine = i.getdriver.id,passengerid = i.passengerid.id)
+                if len(repor) > 0 or len(arepor) > 0:
                     resa['str'] = '1'
-                except:
+                else:
                     resa['str'] = '0'
                 resa['getdr'] = i.getdriver.name.capitalize()
                 resa['getpas'] = i.passengerid.name.capitalize()
@@ -472,6 +485,7 @@ def LoginAdmin(request):
         if request.method == "POST":
             uname = request.POST['Username']
             pswd = request.POST['password']
+            nextpage = request.POST['next']
                 
             # user = admin_credentials.objects.create(
             #     username = uname,
@@ -482,11 +496,12 @@ def LoginAdmin(request):
             # messages.success(request, f"Register Successfully")
             # return redirect("doxer_admin:loginpage")
             user = admin_credentials.objects.filter(username=uname)
+            # user = User.objects.filter(username=uname)
             if len(user) > 0:
                 pas = check_password(pswd, user[0].password)
                 if pas:
                     request.session['id'] = user[0].id
-                    return redirect("doxer_admin:indexpage")
+                    return redirect(nextpage)
                 else:
                     messages.error(request, f"Password is Incorrect..!")
                     return redirect("doxer_admin:loginpage")
@@ -499,6 +514,7 @@ def LoginAdmin(request):
     except:
         return redirect('doxer_admin:loginpage')
 
+@csrf_exempt
 def LogoutAdmin(request):
     try:
         if 'id' in request.session:
@@ -509,6 +525,7 @@ def LogoutAdmin(request):
     except:
         return redirect("doxer_admin:loginpage")
 
+@csrf_exempt
 def car_accept(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -571,6 +588,7 @@ def car_accept(request):
     else:
         return JsonResponse({'status':0})
 
+@csrf_exempt
 def car_reject(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -631,7 +649,8 @@ def car_reject(request):
             return JsonResponse({'status':0})
     else:  
         return JsonResponse({'status':0})
-    
+
+@csrf_exempt    
 def BlockPassenger(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -664,7 +683,8 @@ def BlockPassenger(request):
             return JsonResponse({'status':0})
     else:
         return JsonResponse({'status':0})
-    
+
+@csrf_exempt    
 def BlockDriver(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -700,6 +720,7 @@ def BlockDriver(request):
     else:
         return JsonResponse({'status':0})
 
+@csrf_exempt
 def editprice(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -711,6 +732,7 @@ def editprice(request):
     else:
         return JsonResponse({'status':0})
 
+@csrf_exempt
 def editcar(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -725,6 +747,7 @@ def editcar(request):
     else:
         return JsonResponse({'status':0})
 
+@csrf_exempt
 def updateprice(request):
     if 'id' in request.session:
         try:    
@@ -744,7 +767,8 @@ def updateprice(request):
             return JsonResponse({'status':2})
     else:
         return JsonResponse({'status':2})
-    
+
+@csrf_exempt    
 def map_view(request):
     if 'id' in request.session:
         if request.method=='POST':
@@ -766,8 +790,7 @@ def map_view(request):
     else:
         return redirect("doxer_admin:loginpage")
 
-import re
-
+@csrf_exempt
 def map(request):
     lat_a = request.GET.get("lat_a")
     long_a = request.GET.get("long_a")
@@ -797,6 +820,7 @@ def map(request):
         "lat2" : ridesta.car_latitude,
         'lng2' : ridesta.car_longitude,
     }
+    
     if request.method == "POST":
         rideid = request.POST.get("rid")
         timer = request.POST.get("time")
@@ -808,11 +832,11 @@ def map(request):
                 ridesta.publish = '1'
                 ridesta.save()
             if ridesta.as_user == "Driver":
-                print(km,"----From Map")
                 km1 = re.sub(",","",km)
                 realkm = float(km1.replace("km",""))
-                print(realkm,"----From Map")
-                ridesta.fees = realkm * ridesta.getdriver.fare_per_km
+                price = realkm * float(ridesta.per_km)
+                fees = float(price) / int(ridesta.seats)
+                ridesta.fees = fees
                 ridesta.map_date = timer
                 ridesta.publish = '1'
                 ridesta.save()
@@ -833,6 +857,7 @@ def map(request):
         return JsonResponse(context)
     return render(request, 'doxer_admin/maps.html', context)
 
+@csrf_exempt
 def Id_proofes(request,pk):
     if pk == '1':
         id = request.POST.get('id')

@@ -7,6 +7,7 @@ Gender = (('M', 'Male'), ('F', 'Female'), ('O', 'Other'))
 
 class Driver(models.Model):
     name = models.CharField(max_length=255,blank=True)
+    DeviceId = models.CharField(max_length=255,blank=True,null=True)
     pro_image = models.ImageField(upload_to="Drivers/", height_field=None, width_field=None, default='Drivers/Image.jpg', max_length=255)
     image1 = models.ImageField(upload_to="Drivers_documents/",default='Drivers_documents/idproof.png', height_field=None, width_field=None, max_length=255,blank=True,null=True)
     image2 = models.ImageField(upload_to="Drivers_documents/",default='Drivers_documents/idproof.png', height_field=None, width_field=None, max_length=255,blank=True,null=True)
@@ -30,9 +31,6 @@ class Driver(models.Model):
 
     def __str__(self):
         return self.name if self.name else self.email_or_num
-        
-    # def __unicode__(self):
-    #     return self.email_or_num
 
 class Vehical_brand(models.Model):
     brand = models.CharField(max_length=255)
@@ -61,7 +59,8 @@ class Vehicle(models.Model):
 
 class Passanger(models.Model):
     name = models.CharField(max_length=255,blank=True)
-    pro_image = models.ImageField(upload_to="Passenger/",default='Passenger/Image.jpg', height_field=None, width_field=None, max_length=255)
+    DeviceId = models.CharField(max_length=255,blank=True,null=True)
+    pro_image = models.ImageField(upload_to="Passenger/",default='Passenger/Image.png', height_field=None, width_field=None, max_length=255)
     image1 = models.ImageField(upload_to="Passengers_documents/",default='Passengers_documents/idproof.png', height_field=None, width_field=None, max_length=255,blank=True,null=True)
     image2 = models.ImageField(upload_to="Passengers_documents/",default='Passengers_documents/idproof.png', height_field=None, width_field=None, max_length=255,blank=True,null=True)
     img_status = models.CharField(max_length=255,default='0')
@@ -83,19 +82,7 @@ class Passanger(models.Model):
     
     def __str__(self):
         return self.name
-
-# class Id_proofe(models.Model):
-#     driverid = models.ForeignKey(Driver, on_delete=models.CASCADE,null=True,blank=True)
-#     passengerid = models.ForeignKey(Passanger, on_delete=models.CASCADE,null=True,blank=True)
-#     # document = models.FileField(upload_to='Drivers_documents/',blank=True,null=True)
-#     image1 = models.ImageField(upload_to="Drivers_documents/", height_field=None, width_field=None, max_length=255,blank=True,null=True)
-#     image2 = models.ImageField(upload_to="Drivers_documents/", height_field=None, width_field=None, max_length=255,blank=True,null=True)
-#     image3 = models.ImageField(upload_to="Passengers_documents/", height_field=None, width_field=None, max_length=255,blank=True,null=True)
-#     image4 = models.ImageField(upload_to="Passengers_documents/", height_field=None, width_field=None, max_length=255,blank=True,null=True)
-#     status = models.CharField(default=0,max_length=20)
-#     create = models.DateTimeField(blank=True,null=True)
-#     update = models.DateTimeField(blank=True,null=True)
-    
+  
 class Cities(models.Model):
     name = models.CharField(max_length=255)
     class Meta:
@@ -124,6 +111,7 @@ class Ride(models.Model):
     dropout_address2 = models.CharField(blank=True,max_length=255)
     car_latitude = models.CharField(blank=True,max_length=255)
     car_longitude = models.CharField(blank=True,max_length=255)
+    per_km = models.CharField(blank=True,max_length=255)
     date = models.DateField(blank=True,null=True)
     time = models.CharField(blank=True,max_length=255,null=True)
     dtime = models.CharField(blank=True,max_length=255,null=True)
@@ -169,78 +157,6 @@ class Ride_pin(models.Model):
     today = models.DateField(blank=True,null=True)
     request_date = models.DateTimeField(blank=True)
 
-# class Booking(models.Model):
-#     getpassenger = models.ForeignKey(Passanger, on_delete=models.CASCADE,null=True)
-#     passanger_name = models.CharField(max_length=255,blank=True)
-#     passenger = models.CharField(max_length=255,blank=True,null=True)
-#     ride_type = models.CharField(max_length=20,choices=[('T','Truck'),('C','Car')])
-#     parcel = models.CharField(max_length=255,blank=True,null=True)
-#     pickUp = models.CharField(max_length=255,blank=True,null=True)
-#     pickUp_latitude = models.CharField(blank=True,max_length=255)
-#     pickUp_longitude = models.CharField(blank=True,max_length=255)
-#     dropout = models.CharField(max_length=255,blank=True,null=True)
-#     dropout_latitude = models.CharField(blank=True,max_length=255)
-#     dropout_longitude = models.CharField(blank=True,max_length=255)
-#     pickup_address1 = models.CharField(blank=True,max_length=255)
-#     pickup_address2 = models.CharField(blank=True,max_length=255)
-#     dropout_address1 = models.CharField(blank=True,max_length=255)
-#     dropout_address2 = models.CharField(blank=True,max_length=255)
-#     date = models.DateField()
-#     time = models.TimeField(blank=True,null=True)
-#     status = models.CharField(default=0,max_length=20)
-#     create_at = models.DateTimeField(blank=True)
-#     update_at = models.DateTimeField(blank=True)
-    
-    # def __str__(self):
-    #     if self.parcel and self.passenger:
-    #         return f"{self.getpassenger} Add Booking For {self.parcel} Parcel and {self.passenger} Passenger \"( {self.pickUp} )\" To \"( {self.dropout} )\" at '{self.date}'"
-    #     if self.parcel:
-    #         return f"{self.getpassenger} Add Booking For {self.parcel} Parcel \"( {self.pickUp} )\" To \"( {self.dropout} )\" at '{self.date}'"
-    #     if self.passenger:
-    #         return f"{self.getpassenger} Add Booking For {self.passenger} People \"( {self.pickUp} )\" To \"( {self.dropout} )\" at '{self.date}'"
-    
-# class Booking_pin(models.Model):
-#     mine_booking = models.ForeignKey(Passanger, on_delete=models.CASCADE)
-#     getbooking = models.ForeignKey(Booking, on_delete=models.CASCADE,null=True)
-#     driverid = models.ForeignKey(Driver, on_delete=models.CASCADE,null=True)
-#     offer_price = models.IntegerField()
-#     offer_car = models.ForeignKey(Vehicle, on_delete=models.SET_NULL,null=True,blank=True)
-#     pickUp = models.CharField(max_length=255,blank=True,null=True)
-#     dropout = models.CharField(max_length=255,blank=True,null=True)
-#     status = models.CharField(default=0,max_length=20)
-#     request_date = models.DateTimeField(blank=True)
-    
-#     def  __str__(self):
-#         return f"{self.driverid}-> Requested To ---{self.getbooking.getpassenger}---"
-
-# class Trip(models.Model):
-#     # dri = models.ManyToManyField(Driver,related_name='drivers',blank=True)
-#     getdr = models.ForeignKey(Driver, on_delete=models.SET_NULL,blank=True,null=True)
-#     getpas = models.ForeignKey(Passanger, on_delete=models.SET_NULL,blank=True,null=True)
-#     pas = models.ManyToManyField(Passanger,related_name='passengers',blank=True)
-#     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL,blank=True,null=True)
-#     driver_name = models.CharField(max_length=255,blank=True)
-#     passenger_name = models.CharField(max_length=255,blank=True)
-#     passengers = models.IntegerField(blank=True,null=True)
-#     parcels = models.CharField(max_length=255,blank=True,null=True)
-#     Location = models.CharField(max_length=200,blank=True)
-#     Location_lat = models.FloatField(max_length=200,blank=True)
-#     Location_lng = models.FloatField(max_length=200,blank=True)
-#     destination = models.CharField(max_length=200,blank=True)
-#     destination_lat = models.FloatField(max_length=200,blank=True)
-#     destination_lng = models.FloatField(max_length=200,blank=True)
-#     trip_date = models.DateField(blank=True)
-#     fees = models.FloatField(max_length=20,blank=True,null=True)
-#     trip_status = models.CharField(default='P',max_length=20,choices=[('P','Pending'),('O','On The Way'),('E','Complete Trip'),('C','Cancel')])
-#     pick_status = models.CharField(default='W',max_length=20,choices=[('W','Waiting'),('P','Pickup'),('D','Drop'),('C','Close')])
-#     status = models.CharField(default='P',max_length=20,choices=[('P','Pending'),('O','On The Way'),('E','Complete Trip'),('C','Cancel')])
-#     today = models.DateField(blank=True,null=True)
-#     create_at = models.DateTimeField(blank=True)
-#     update_at = models.DateTimeField(blank=True)
-    
-#     def __str__(self):
-#         return f" {self.getdr} And {self.getpas} Start This Trip At {self.trip_date}"
-
 class Drivers_Rating(models.Model):
     mine = models.ForeignKey(Driver, on_delete=models.CASCADE)
     tri = models.ForeignKey(Ride,on_delete=models.CASCADE,blank=True,null=True)
@@ -271,7 +187,6 @@ class Passenger_Report(models.Model):
     report_text = models.TextField(blank=True)
     create = models.DateField(blank=True,null=True)
 
-
 class Search_History(models.Model):
     driverid = models.ForeignKey(Driver,on_delete=models.CASCADE,blank=True,null=True)
     passengerid = models.ForeignKey(Passanger,on_delete=models.CASCADE,blank=True,null=True)
@@ -284,3 +199,15 @@ class Search_History(models.Model):
     date = models.DateField(null=True,blank=True)
     location = models.CharField(max_length=255)
     create = models.DateField(blank=True,null=True)
+
+class Car_Details(models.Model):
+    # source_url = models.CharField(db_column='Source URL', max_length=100, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    make = models.CharField(db_column='Make', max_length=9, blank=True, null=True)  # Field name made lowercase.
+    model = models.CharField(db_column='Model', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    version = models.CharField(db_column='Version', max_length=29, blank=True, null=True)  # Field name made lowercase.
+    notes = models.CharField(db_column='Notes', max_length=12, blank=True, null=True)  # Field name made lowercase.
+    image_url = models.CharField(db_column='Image URL', max_length=1061, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    key_seating_capacity = models.CharField(db_column='Key Seating Capacity', max_length=8, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    seating_capacity = models.CharField(db_column='Seating Capacity', max_length=8, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    no_of_seating_rows = models.CharField(db_column='No of Seating Rows', max_length=6, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    bootspace = models.CharField(db_column='Bootspace', max_length=10, blank=True, null=True)  # Field name made lowercase.

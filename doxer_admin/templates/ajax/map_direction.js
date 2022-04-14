@@ -9,14 +9,17 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
         if (status == "P"){
             var map = new google.maps.Map(document.getElementById('map-route'), {
                 zoom: 9,
+                maxZoom: 16,
                 center: { lat: lat_a, lng: long_a }
             });
         }
         if (status == 'O'){
             var map = new google.maps.Map(document.getElementById('map-route'), {
-                zoom: 1.5,
+                zoom: 6,
+                maxZoom: 16,
+                minZoom: 8,
                 center: { lat: lat_a, lng: long_a },
-                // mapTypeId: "hybrid",
+                //mapTypeId: "hybrid",
             });
             setInterval(function(){
                 var currentposition = $("#map-route").attr('currentposition');
@@ -26,7 +29,7 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
                         var marker = new google.maps.Marker({
                             position: new google.maps.LatLng(currentposition,currentposition2),
                             draggable: true,
-                            icon : "http://192.168.1.72:8000/static/images/giphy.gif",
+                            icon : "http://192.168.1.72:8000/static/images/car.png",
                             // animation: google.maps.Animation.DROP,
                             // icon: {
                             //       path: google.maps.SymbolPath.CIRCLE,
@@ -40,7 +43,7 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
                         var marker = new google.maps.Marker({
                             position: new google.maps.LatLng(currentposition,currentposition2),
                             draggable: true,
-                            icon : "http://192.168.1.72:8000/static/images/JOP.gif",
+                            icon : "http://192.168.1.72:8000/static/images/Truck.png",
                             // animation: google.maps.Animation.DROP,
                             // icon: {
                             //       path: google.maps.SymbolPath.CIRCLE,
@@ -63,6 +66,8 @@ $.getScript("https://maps.googleapis.com/maps/api/js?key=" + google_api_key + "&
             var currentposition2 = parseFloat($("#map-route").attr('currentposition2'));
             var map = new google.maps.Map(document.getElementById('map-route'), {
             zoom: 7,
+            maxZoom: 16,
+            minZoom: 8,
             center: { lat: currentposition, lng: currentposition2 }
         });
             var currentposition = $("#map-route").attr('currentposition');
@@ -105,6 +110,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
             origin: origin,
             destination: destination,
             travelMode: 'DRIVING'
+            //travelMode: 'TRANSIT'
         }, function(response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);

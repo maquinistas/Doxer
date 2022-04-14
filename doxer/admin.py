@@ -24,7 +24,7 @@ class rideadmin(admin.ModelAdmin):
     list_display = ('id','as_user','ride_type','pickUp','dropout','date','trip_status','seats','capacity','fees','status')
     list_display_links = ('id','as_user','ride_type','pickUp','dropout','date','seats','capacity')
     ordering = ('-id'),
-    list_editable = ('fees'),('status'),
+    list_editable = ('fees'),('status'),('trip_status')
     search_fields = ('driver'),
 
 class vehicaladmin(admin.ModelAdmin):
@@ -40,6 +40,21 @@ class ridepin(admin.ModelAdmin):
     list_display = ('id','as_user','getdriver','getride','passengerid','ride_type','today','status','fees')
     list_display_links = ('id','getdriver','getride','passengerid','ride_type','today','status','fees')
     ordering = ('-id'),
+
+class city(admin.ModelAdmin):
+    list_per_page = 15 # No of records per page 
+    list_display = ('id','name')
+    list_display_links = ('id','name')
+    ordering = ('-id'),
+    search_fields = ('name'),
+    
+class Car_Admin(admin.ModelAdmin):
+    list_per_page = 15 # No of records per page 
+    list_display = ('id','make','model','version','notes','image_url','key_seating_capacity','seating_capacity','no_of_seating_rows','bootspace')
+    list_display_links = ('id','make','model','version','notes','image_url','key_seating_capacity','seating_capacity','no_of_seating_rows','bootspace')
+    ordering = ('-id'),
+    list_filter = ('make'),('notes'),
+    search_fields = ('make','model'),
     
 # SHOW ON ADMIN PANEL 
 admin.site.register(Driver,Driveradmin)
@@ -47,7 +62,8 @@ admin.site.register(Passanger,Passangerradmin)
 admin.site.register(Ride,rideadmin)
 admin.site.register(Vehical_brand)
 admin.site.register(Car_name)
-admin.site.register(Cities)
+admin.site.register(Car_Details,Car_Admin)
+admin.site.register(Cities,city)
 admin.site.register(Drivers_Rating)
 admin.site.register(Passenger_Rating)
 admin.site.register(Ride_pin,ridepin)
